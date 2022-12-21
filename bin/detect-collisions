@@ -52,4 +52,4 @@ if ($collisions === []) {
     echo "OK: no name collision found in: " . implode(', ', $directories) . "\n";
 }
 
-exit(count($collisions));
+exit(count($collisions) > 0 ? 1 : 0);
