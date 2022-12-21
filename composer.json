@@ -1,0 +1,59 @@
+{
+    "name": "shipmonk/name-collision-detector",
+    "description": "Simple tool to find class/function/constant name duplicates within your project.",
+    "license": [
+        "MIT"
+    ],
+    "keywords": [
+        "namespace",
+        "collision",
+        "autoload",
+        "classname"
+    ],
+    "require": {
+        "roave/better-reflection": "^6.1"
+    },
+    "require-dev": {
+        "editorconfig-checker/editorconfig-checker": "^10.3.0",
+        "ergebnis/composer-normalize": "^2.28",
+        "phpstan/phpstan-phpunit": "^1.1.1",
+        "phpstan/phpstan-strict-rules": "^1.2.3",
+        "phpunit/phpunit": "^9.5.20",
+        "slevomat/coding-standard": "^8.0.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "ShipMonk\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ShipMonk\\": "tests/"
+        }
+    },
+    "bin": [
+        "bin/detect-collisions"
+    ],
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "dealerdirect/phpcodesniffer-composer-installer": false
+        },
+        "sort-packages": true
+    },
+    "scripts": {
+        "check": [
+            "@check:composer",
+            "@check:ec",
+            "@check:cs",
+            "@check:types",
+            "@check:tests"
+        ],
+        "check:composer": "composer normalize --dry-run --no-check-lock --no-update-lock",
+        "check:cs": "phpcs",
+        "check:ec": "ec src tests",
+        "check:tests": "phpunit -vvv tests",
+        "check:types": "phpstan analyse -vvv",
+        "fix:cs": "phpcbf"
+    }
+}

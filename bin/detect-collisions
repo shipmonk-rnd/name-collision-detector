@@ -1,0 +1,45 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+use ShipMonk\InvalidPathProvidedException;
+use ShipMonk\NameCollisionDetector;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$cwd = getcwd();
+$directories = array_map(static function (string $arg) use ($cwd): string {
+    return $cwd . '/' . $arg;
+}, array_slice($argv, 1));
+
+if ($directories === []) {
+    echo "ERROR: no directories provided, use e.g. `detect-collisions src tests`\n";
+    exit(255);
+}
+
+try {
+    $detector = new NameCollisionDetector($directories, $cwd);
+} catch (InvalidPathProvidedException $e) {
+    echo "ERROR: {$e->getMessage()}\n";
+    exit(255);
+}
+
+$collisions = array_merge(
+    $detector->getCollidingClasses(),
+    $detector->getCollidingFunctions(),
+    $detector->getCollidingConstants(),
+);
+
+foreach ($collisions as $name => $filePaths) {
+    $count = count($filePaths);
+    echo "$name is defined $count times:\n";
+    foreach ($filePaths as $filePath) {
+        echo " > $filePath\n";
+    }
+    echo "\n";
+}
+
+if ($collisions === []) {
+    echo "OK: no name collision found in: " . implode(', ', $directories) . "\n";
+}
+
+exit(count($collisions));
