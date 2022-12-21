@@ -244,7 +244,7 @@
         <severity>5</severity><!-- turned off by PSR2 -> turning on with default severity -->
     </rule>
 
-    <rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma"/>
+    <!-- rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma"/ --> <!-- after bumping PHP -->
     <rule ref="SlevomatCodingStandard.Classes.ModernClassNameReference">
         <exclude name="SlevomatCodingStandard.Classes.ModernClassNameReference.ClassNameReferencedViaFunctionCall"/> <!-- after bumping to PHP8 -->
     </rule>
@@ -304,7 +304,7 @@
     <rule ref="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly"/>
     <rule ref="SlevomatCodingStandard.Functions.DisallowArrowFunction"/>
     <rule ref="SlevomatCodingStandard.Functions.DisallowNamedArguments"/>
-    <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall"/>
+    <!-- rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall"/ --> <!-- after bumping PHP version -->
     <rule ref="SlevomatCodingStandard.Functions.StaticClosure"/>
     <rule ref="SlevomatCodingStandard.Functions.UselessParameterDefaultValue"/>
     <rule ref="SlevomatCodingStandard.Functions.UnusedInheritedVariablePassedToClosure"/>
@@ -365,7 +365,7 @@
     <rule ref="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint" />
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
         <properties>
-            <property name="enableNativeTypeHint" value="true"/>
+            <property name="enableNativeTypeHint" value="false"/>
             <property name="traversableTypeHints" type="array" value="
                 Generator,
                 Traversable,

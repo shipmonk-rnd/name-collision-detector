@@ -26,15 +26,21 @@ use function preg_replace;
 class NameCollisionDetector
 {
 
-    private SourceLocator $sourceLocator;
+    /**
+     * @var SourceLocator
+     */
+    private $sourceLocator;
 
-    private ?string $cwd;
+    /**
+     * @var string|null
+     */
+    private $cwd;
 
     /**
      * Based on: https://github.com/Roave/BetterReflection/blob/396a07c9d276cb9ffba581b24b2dadbb542d542e/demo/parsing-whole-directory/example2.php
      *
      * @param list<string> $directories
-     * @param ?string $cwd Path prefix to strip
+     * @param string|null $cwd Path prefix to strip
      * @throws InvalidPathProvidedException
      */
     public function __construct(array $directories, ?string $cwd = null)
@@ -44,9 +50,9 @@ class NameCollisionDetector
             $sourceLocator = new AggregateSourceLocator([
                 new DirectoriesSourceLocator(
                     $directories,
-                    $astLocator,
+                    $astLocator
                 ),
-                new AutoloadSourceLocator($astLocator),
+                new AutoloadSourceLocator($astLocator)
             ]);
         } catch (InvalidFileInfo | InvalidDirectory $e) {
             throw new InvalidPathProvidedException($e);
