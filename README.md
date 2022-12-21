@@ -30,3 +30,7 @@ Having colliding classes within project can cause crazy headaches while debuggin
 Typically, you have PSR-4 autoloading solving this problem for you, but there are cases (like [PHPStan rules test files](https://github.com/shipmonk-rnd/phpstan-rules/tree/master/tests/Rule/data)) where you want to write any code (with [classmap](https://getcomposer.org/doc/04-schema.md#classmap) autoloading).
 And in such cases, the test may work when executed in standalone run, but fail when running all the tests together (depending on which class was autoloaded first).
 Therefore, having a collision detector in CI might be useful.
+
+## Versions
+- 1.x supports PHP 7.2 - PHP 8.2
+
