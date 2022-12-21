@@ -75,10 +75,10 @@ class NameCollisionDetector
     }
 
     /**
-     * @param list<ReflectionClass>|list<ReflectionFunction>|list<ReflectionConstant> $reflections
+     * @param iterable<ReflectionClass>|iterable<ReflectionFunction>|iterable<ReflectionConstant> $reflections
      * @return array<string, list<string>>
      */
-    private function getCollisions(array $reflections): array
+    private function getCollisions(iterable $reflections): array
     {
         $classToFilesMap = [];
 
