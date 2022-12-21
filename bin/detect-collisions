@@ -36,7 +36,7 @@ try {
 $collisions = array_merge(
     $detector->getCollidingClasses(),
     $detector->getCollidingFunctions(),
-    $detector->getCollidingConstants(),
+    $detector->getCollidingConstants()
 );
 
 foreach ($collisions as $name => $filePaths) {

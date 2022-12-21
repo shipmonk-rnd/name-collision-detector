@@ -11,14 +11,15 @@
         "classname"
     ],
     "require": {
-        "roave/better-reflection": "^6.1"
+        "roave/better-reflection": "4.* || 5.* || 6.*"
     },
     "require-dev": {
         "editorconfig-checker/editorconfig-checker": "^10.3.0",
-        "ergebnis/composer-normalize": "^2.28",
+        "ergebnis/composer-normalize": "^2.19",
+        "phpstan/phpstan": "^1.8.7",
         "phpstan/phpstan-phpunit": "^1.1.1",
         "phpstan/phpstan-strict-rules": "^1.2.3",
-        "phpunit/phpunit": "^9.5.20",
+        "phpunit/phpunit": "^8.5.28 || ^9.5.20",
         "slevomat/coding-standard": "^8.0.1"
     },
     "autoload": {
@@ -36,8 +37,8 @@
     ],
     "config": {
         "allow-plugins": {
-            "ergebnis/composer-normalize": true,
-            "dealerdirect/phpcodesniffer-composer-installer": false
+            "dealerdirect/phpcodesniffer-composer-installer": false,
+            "ergebnis/composer-normalize": true
         },
         "sort-packages": true
     },

@@ -33,7 +33,7 @@ class NameCollisionDetectorTest extends TestCase
                     '/sample-collisions/file2.php',
                 ],
             ],
-            $collidingClasses,
+            $collidingClasses
         );
 
         self::assertSame(
@@ -47,7 +47,7 @@ class NameCollisionDetectorTest extends TestCase
                     '/sample-collisions/file2.php',
                 ],
             ],
-            $collidingFunctions,
+            $collidingFunctions
         );
 
         self::assertSame(
@@ -61,7 +61,7 @@ class NameCollisionDetectorTest extends TestCase
                     '/sample-collisions/file2.php',
                 ],
             ],
-            $collidingConstants,
+            $collidingConstants
         );
     }
 
