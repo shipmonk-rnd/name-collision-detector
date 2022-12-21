@@ -7,12 +7,17 @@ use Roave\BetterReflection\BetterReflection;
 use Roave\BetterReflection\Reflection\ReflectionClass;
 use Roave\BetterReflection\Reflection\ReflectionConstant;
 use Roave\BetterReflection\Reflection\ReflectionFunction;
+use Roave\BetterReflection\Reflector\ClassReflector;
+use Roave\BetterReflection\Reflector\ConstantReflector;
 use Roave\BetterReflection\Reflector\DefaultReflector;
+use Roave\BetterReflection\Reflector\FunctionReflector;
 use Roave\BetterReflection\SourceLocator\Exception\InvalidDirectory;
 use Roave\BetterReflection\SourceLocator\Exception\InvalidFileInfo;
 use Roave\BetterReflection\SourceLocator\Type\AggregateSourceLocator;
 use Roave\BetterReflection\SourceLocator\Type\AutoloadSourceLocator;
 use Roave\BetterReflection\SourceLocator\Type\DirectoriesSourceLocator;
+use Roave\BetterReflection\SourceLocator\Type\SourceLocator;
+use function class_exists;
 use function count;
 use function ksort;
 use function preg_quote;
@@ -21,7 +26,7 @@ use function preg_replace;
 class NameCollisionDetector
 {
 
-    private DefaultReflector $reflector;
+    private SourceLocator $sourceLocator;
 
     private ?string $cwd;
 
@@ -35,18 +40,19 @@ class NameCollisionDetector
     public function __construct(array $directories, ?string $cwd = null)
     {
         try {
+            $astLocator = (new BetterReflection())->astLocator();
             $sourceLocator = new AggregateSourceLocator([
                 new DirectoriesSourceLocator(
                     $directories,
-                    (new BetterReflection())->astLocator(),
+                    $astLocator,
                 ),
-                new AutoloadSourceLocator((new BetterReflection())->astLocator()),
+                new AutoloadSourceLocator($astLocator),
             ]);
         } catch (InvalidFileInfo | InvalidDirectory $e) {
             throw new InvalidPathProvidedException($e);
         }
 
-        $this->reflector = new DefaultReflector($sourceLocator);
+        $this->sourceLocator = $sourceLocator;
         $this->cwd = $cwd;
     }
 
@@ -55,7 +61,7 @@ class NameCollisionDetector
      */
     public function getCollidingConstants(): array
     {
-        return $this->getCollisions($this->reflector->reflectAllConstants());
+        return $this->getCollisions($this->reflectAllConstants());
     }
 
     /**
@@ -63,7 +69,7 @@ class NameCollisionDetector
      */
     public function getCollidingFunctions(): array
     {
-        return $this->getCollisions($this->reflector->reflectAllFunctions());
+        return $this->getCollisions($this->reflectAllFunctions());
     }
 
     /**
@@ -71,7 +77,37 @@ class NameCollisionDetector
      */
     public function getCollidingClasses(): array
     {
-        return $this->getCollisions($this->reflector->reflectAllClasses());
+        return $this->getCollisions($this->reflectAllClasses());
+    }
+
+    /**
+     * @return iterable<ReflectionClass>
+     */
+    private function reflectAllClasses(): iterable
+    {
+        return class_exists(ClassReflector::class)
+            ? (new ClassReflector($this->sourceLocator))->getAllClasses()
+            : (new DefaultReflector($this->sourceLocator))->reflectAllClasses();
+    }
+
+    /**
+     * @return iterable<ReflectionFunction>
+     */
+    private function reflectAllFunctions(): iterable
+    {
+        return class_exists(FunctionReflector::class)
+            ? (new FunctionReflector($this->sourceLocator, new ClassReflector($this->sourceLocator)))->getAllFunctions()
+            : (new DefaultReflector($this->sourceLocator))->reflectAllFunctions();
+    }
+
+    /**
+     * @return iterable<ReflectionConstant>
+     */
+    private function reflectAllConstants(): iterable
+    {
+        return class_exists(ConstantReflector::class)
+            ? (new ConstantReflector($this->sourceLocator, new ClassReflector($this->sourceLocator)))->getAllConstants()
+            : (new DefaultReflector($this->sourceLocator))->reflectAllConstants();
     }
 
     /**
