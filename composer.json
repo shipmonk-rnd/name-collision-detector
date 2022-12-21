@@ -47,11 +47,13 @@
             "@check:ec",
             "@check:cs",
             "@check:types",
-            "@check:tests"
+            "@check:tests",
+            "@check:self"
         ],
         "check:composer": "composer normalize --dry-run --no-check-lock --no-update-lock",
         "check:cs": "phpcs",
         "check:ec": "ec src tests",
+        "check:self": "bin/detect-collisions src",
         "check:tests": "phpunit -vvv tests",
         "check:types": "phpstan analyse -vvv",
         "fix:cs": "phpcbf"
