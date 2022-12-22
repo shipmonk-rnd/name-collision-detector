@@ -3,7 +3,6 @@
 
 use ShipMonk\InvalidPathProvidedException;
 use ShipMonk\NameCollisionDetector;
-use Phalcon\Cop\Parser as CliArgParser;
 
 $autoloadFiles = [
     __DIR__ . '/../vendor/autoload.php',
@@ -20,7 +19,7 @@ foreach ($autoloadFiles as $autoloadFile) {
 $possibleOptions = ['classes', 'functions', 'constants'];
 $providedOptions = getopt('', $possibleOptions, $restIndex);
 $check = array_keys($providedOptions);
-$check = $check === [] ? $possibleOptions : $check; // check all if no options is provided
+$check = $check === [] ? $possibleOptions : $check; // check all if no option is provided
 
 $cwd = getcwd();
 $providedFolders = array_slice($argv, $restIndex);
@@ -33,14 +32,14 @@ if ($directories === []) {
     exit(255);
 }
 
-echo "Checking duplicates of " . implode(' and ', $check) . " in " . implode(', ', $providedFolders) . ":\n\n";
-
 try {
     $detector = new NameCollisionDetector($directories, $cwd);
 } catch (InvalidPathProvidedException $e) {
     echo "ERROR: {$e->getMessage()}\n";
     exit(255);
 }
+
+echo "Checking duplicates of " . implode(' and ', $check) . " in " . implode(', ', $providedFolders) . ":\n\n";
 
 $collisions = array_merge(
     in_array('classes', $check, true) ? $detector->getCollidingClasses() : [],
