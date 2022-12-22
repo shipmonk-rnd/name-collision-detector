@@ -4,6 +4,7 @@ namespace ShipMonk;
 
 use PHPUnit\Framework\TestCase;
 use function fclose;
+use function preg_match;
 use function proc_close;
 use function proc_open;
 use function stream_get_contents;
@@ -45,8 +46,8 @@ EOF;
 
         self::assertSame($expectedClasses, $this->runCommand(__DIR__ . '/../bin/detect-collisions --classes sample-collisions', 1));
         self::assertSame($expectedNoDirectory, $this->runCommand(__DIR__ . '/../bin/detect-collisions', 255));
-        self::assertMatchesRegularExpression($expectedInvalidDirectoryRegex, $this->runCommand(__DIR__ . '/../bin/detect-collisions nonsense', 255));
-        self::assertMatchesRegularExpression($expectedSuccessRegex, $this->runCommand(__DIR__ . '/../bin/detect-collisions ../src', 0));
+        self::assertSame(1, preg_match($expectedInvalidDirectoryRegex, $this->runCommand(__DIR__ . '/../bin/detect-collisions nonsense', 255)));
+        self::assertSame(1, preg_match($expectedSuccessRegex, $this->runCommand(__DIR__ . '/../bin/detect-collisions ../src', 0)));
     }
 
     public function testCollisionDetection(): void
