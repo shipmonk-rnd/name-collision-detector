@@ -16,10 +16,16 @@ foreach ($autoloadFiles as $autoloadFile) {
     }
 }
 
+$possibleOptions = ['classes', 'functions', 'constants'];
+$providedOptions = getopt('', $possibleOptions, $restIndex);
+$check = array_keys($providedOptions);
+$check = $check === [] ? $possibleOptions : $check; // check all if no option is provided
+
 $cwd = getcwd();
+$providedFolders = array_slice($argv, $restIndex);
 $directories = array_map(static function (string $arg) use ($cwd): string {
     return $cwd . '/' . $arg;
-}, array_slice($argv, 1));
+}, $providedFolders);
 
 if ($directories === []) {
     echo "ERROR: no directories provided, use e.g. `detect-collisions src tests`\n";
@@ -33,10 +39,12 @@ try {
     exit(255);
 }
 
+echo "Checking duplicates of " . implode(' and ', $check) . " in " . implode(', ', $providedFolders) . ":\n\n";
+
 $collisions = array_merge(
-    $detector->getCollidingClasses(),
-    $detector->getCollidingFunctions(),
-    $detector->getCollidingConstants()
+    in_array('classes', $check, true) ? $detector->getCollidingClasses() : [],
+    in_array('functions', $check, true) ? $detector->getCollidingFunctions() : [],
+    in_array('constants', $check, true) ? $detector->getCollidingConstants() : []
 );
 
 foreach ($collisions as $name => $filePaths) {

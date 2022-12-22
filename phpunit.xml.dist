@@ -9,6 +9,7 @@
         beStrictAboutTodoAnnotatedTests="true"
         failOnRisky="true"
         failOnWarning="true"
+        convertDeprecationsToExceptions="false"
         cacheResultFile="cache/phpunit.result.cache"
 >
     <php>

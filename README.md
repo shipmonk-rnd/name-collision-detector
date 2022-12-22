@@ -10,8 +10,17 @@ composer require --dev shipmonk/name-collision-detector
 ```
 
 ## Usage:
+Check duplicate classes, constants and functions:
 ```sh
 vendor/bin/detect-collisions dir1 dir2 dir3
+```
+
+Or you can select what to check:
+
+```sh
+vendor/bin/detect-collisions --classes src tests # check only duplicate classes
+vendor/bin/detect-collisions --functions src tests # check only duplicate functions
+vendor/bin/detect-collisions --constants src tests # check only duplicate constants
 ```
 
 Example output:
