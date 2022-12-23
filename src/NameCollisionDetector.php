@@ -152,7 +152,7 @@ class NameCollisionDetector
         }
 
         if ($this->cwd !== null) {
-            $cwdForRegEx = preg_quote($this->cwd);
+            $cwdForRegEx = preg_quote($this->cwd, '~');
             $replacedFileName = preg_replace("~^{$cwdForRegEx}~", '', $fileName);
 
             if ($replacedFileName === null) {
