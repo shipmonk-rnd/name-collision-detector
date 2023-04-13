@@ -22,6 +22,7 @@ use function count;
 use function ksort;
 use function preg_quote;
 use function preg_replace;
+use function sort;
 
 class NameCollisionDetector
 {
@@ -139,6 +140,9 @@ class NameCollisionDetector
         foreach ($classToFilesMap as $className => $fileNames) {
             if (count($fileNames) === 1) {
                 unset($classToFilesMap[$className]);
+            } else {
+                sort($fileNames);
+                $classToFilesMap[$className] = $fileNames;
             }
         }
 
