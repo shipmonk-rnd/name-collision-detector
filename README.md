@@ -1,6 +1,6 @@
 # Name collision detector
 
-Simple tool which allows you to detect if there are no classes/functions/constants defined multiple times within the same namespace.
+Simple tool which allows you to detect if there are no classes (or interfaces or traits) defined multiple times within the same namespace.
 Non-zero exit code is returned when any duplicate is found.
 
 ## Installation:
@@ -10,17 +10,9 @@ composer require --dev shipmonk/name-collision-detector
 ```
 
 ## Usage:
-Check duplicate classes, constants and functions:
+Check duplicate classes:
 ```sh
 vendor/bin/detect-collisions dir1 dir2 dir3
-```
-
-Or you can select what to check:
-
-```sh
-vendor/bin/detect-collisions --classes src tests # check only duplicate classes
-vendor/bin/detect-collisions --functions src tests # check only duplicate functions
-vendor/bin/detect-collisions --constants src tests # check only duplicate constants
 ```
 
 Example output:
@@ -29,7 +21,7 @@ Foo\NamespacedClass2 is defined 2 times:
  > /tests/sample-collisions/file2.php
  > /tests/sample-collisions/file2.php
 
-GlobalClass1 is defined 2 times:
+GlobalInterface1 is defined 2 times:
  > /tests/sample-collisions/file1.php
  > /tests/sample-collisions/file2.php
 ```
@@ -41,5 +33,10 @@ And in such cases, the test may work when executed in standalone run, but fail w
 Therefore, having a collision detector in CI might be useful.
 
 ## Versions
-- 1.x supports PHP 7.2 - PHP 8.2
+- 1.x
+  - PHP 7.2 - PHP 8.2
+  - is very slow, but supports finding function & constant duplicates
+- 2.x
+- - PHP 7.2 - PHP 8.2
+  - fast, support finding only class duplicates
 

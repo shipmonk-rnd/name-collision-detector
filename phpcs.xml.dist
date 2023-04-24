@@ -18,7 +18,7 @@
     <file>src/</file>
     <file>tests/</file>
 
-    <exclude-pattern>tests/sample-collisions/*</exclude-pattern>
+    <exclude-pattern>tests/data/*</exclude-pattern>
 
     <config name="installed_paths" value="../../slevomat/coding-standard"/>
 
@@ -344,7 +344,6 @@
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.PartialUse"/>
-    <rule ref="SlevomatCodingStandard.Numbers.RequireNumericLiteralSeparator" />
     <rule ref="SlevomatCodingStandard.Operators.DisallowEqualOperators" />
     <rule ref="SlevomatCodingStandard.Operators.SpreadOperatorSpacing" />
     <rule ref="SlevomatCodingStandard.PHP.DisallowDirectMagicInvokeCall" />
@@ -368,8 +367,7 @@
             <property name="enableNativeTypeHint" value="false"/>
             <property name="traversableTypeHints" type="array" value="
                 Generator,
-                Traversable,
-                Doctrine\Common\Collections\Collection
+                Traversable
             "/>
         </properties>
     </rule>
@@ -378,8 +376,7 @@
         <properties>
             <property name="traversableTypeHints" type="array" value="
                 Generator,
-                Traversable,
-                Doctrine\Common\Collections\Collection
+                Traversable
             "/>
         </properties>
     </rule>
@@ -387,8 +384,7 @@
         <properties>
             <property name="traversableTypeHints" type="array" value="
                 Generator,
-                Traversable,
-                Doctrine\Common\Collections\Collection
+                Traversable
             "/>
         </properties>
     </rule>

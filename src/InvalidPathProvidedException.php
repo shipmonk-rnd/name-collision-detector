@@ -3,14 +3,13 @@
 namespace ShipMonk;
 
 use RuntimeException;
-use Throwable;
 
 class InvalidPathProvidedException extends RuntimeException
 {
 
-    public function __construct(Throwable $previous)
+    public function __construct(string $reason)
     {
-        parent::__construct($previous->getMessage(), 0, $previous);
+        parent::__construct($reason);
     }
 
 }
