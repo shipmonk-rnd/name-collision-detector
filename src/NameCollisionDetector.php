@@ -113,6 +113,7 @@ class NameCollisionDetector
      * Searches classes, interfaces and traits in PHP file.
      * Based on Nette\Loaders\RobotLoader::scanPhp
      *
+     * @license https://github.com/nette/robot-loader/blob/v3.4.0/license.md
      * @return list<string>
      */
     private function getClassesInFile(string $file): array
