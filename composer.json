@@ -1,6 +1,6 @@
 {
     "name": "shipmonk/name-collision-detector",
-    "description": "Simple tool to find ambiguous classes (class name duplicates) within your project.",
+    "description": "Simple tool to find ambiguous classes or any other name duplicates within your project.",
     "license": [
         "MIT"
     ],
@@ -9,7 +9,8 @@
         "collision",
         "ambiguous",
         "autoload",
-        "classname"
+        "classname",
+        "autoloading"
     ],
     "require": {
         "php": "^7.2 || ^8.0",

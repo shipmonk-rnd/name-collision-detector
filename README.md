@@ -1,6 +1,7 @@
 # Name collision detector
 
-Simple tool which allows you to detect if there are no classes (or interfaces or traits) defined multiple times within the same namespace.
+Simple tool which allows you to detect if there are no types defined multiple times within the same namespace.
+This means that any ambiguous class, interface, enum, trait, constant or function is reported.
 Non-zero exit code is returned when any duplicate is found.
 
 ## Installation:
@@ -10,7 +11,7 @@ composer require --dev shipmonk/name-collision-detector
 ```
 
 ## Usage:
-Check duplicate classes:
+Check duplicate types:
 ```sh
 vendor/bin/detect-collisions dir1 dir2 dir3
 ```
@@ -32,11 +33,6 @@ Typically, you have PSR-4 autoloading solving this problem for you, but there ar
 And in such cases, the test may work when executed in standalone run, but fail when running all the tests together (depending on which class was autoloaded first).
 Therefore, having a collision detector in CI might be useful.
 
-## Versions
-- 1.x
-  - PHP 7.2 - PHP 8.2
-  - is very slow, but supports finding function & constant duplicates
-- 2.x
-- - PHP 7.2 - PHP 8.2
-  - fast, support finding only class duplicates
+## Supported PHP versions
+- PHP 7.2 - PHP 8.2
 

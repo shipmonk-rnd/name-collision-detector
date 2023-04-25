@@ -21,10 +21,12 @@ use function token_get_all;
 use const PHP_VERSION_ID;
 use const T_CLASS;
 use const T_COMMENT;
+use const T_CONST;
 use const T_CURLY_OPEN;
 use const T_DOC_COMMENT;
 use const T_DOLLAR_OPEN_CURLY_BRACES;
 use const T_ENUM;
+use const T_FUNCTION;
 use const T_INTERFACE;
 use const T_NAME_QUALIFIED;
 use const T_NAMESPACE;
@@ -67,13 +69,13 @@ class NameCollisionDetector
     /**
      * @return array<string, list<string>>
      */
-    public function getCollidingClasses(): array
+    public function getCollidingTypes(): array
     {
         $classToFilesMap = [];
 
         foreach ($this->directories as $directory) {
             foreach ($this->listPhpFilesIn($directory) as $filePath) {
-                foreach ($this->getClassesInFile($filePath) as $class) {
+                foreach ($this->getTypesInFile($filePath) as $class) {
                     $classToFilesMap[$class][] = $this->normalizePath($filePath);
                 }
             }
@@ -110,13 +112,13 @@ class NameCollisionDetector
     }
 
     /**
-     * Searches classes, interfaces and traits in PHP file.
+     * Searches enums, classes, interfaces, constants, functions and traits in PHP file.
      * Based on Nette\Loaders\RobotLoader::scanPhp
      *
      * @license https://github.com/nette/robot-loader/blob/v3.4.0/license.md
      * @return list<string>
      */
-    private function getClassesInFile(string $file): array
+    public function getTypesInFile(string $file): array
     {
         $code = file_get_contents($file);
 
@@ -124,10 +126,10 @@ class NameCollisionDetector
             throw new FileParsingException("Unable to get contents of $file");
         }
 
-        $expected = false;
+        $expected = null;
         $namespace = $name = '';
         $level = $minLevel = 0;
-        $classes = [];
+        $types = [];
 
         try {
             $tokens = token_get_all($code, TOKEN_PARSE);
@@ -145,12 +147,14 @@ class NameCollisionDetector
 
                     case T_STRING:
                     case PHP_VERSION_ID < 80000 ? T_NS_SEPARATOR : T_NAME_QUALIFIED:
-                        if ($expected !== null && $expected !== false) {
+                        if ($expected !== null) {
                             $name .= $token[1];
                         }
 
                         continue 2;
 
+                    case T_CONST:
+                    case T_FUNCTION:
                     case T_NAMESPACE:
                     case T_CLASS:
                     case T_INTERFACE:
@@ -166,12 +170,13 @@ class NameCollisionDetector
                 }
             }
 
-            if ($expected !== null && $expected !== false) {
+            if ($expected !== null) {
                 if ($expected === T_NAMESPACE) {
                     $namespace = $name !== '' ? $name . '\\' : '';
                     $minLevel = $token === '{' ? 1 : 0;
+
                 } elseif ($name !== '' && $level === $minLevel) {
-                    $classes[] = $namespace . $name;
+                    $types[] = $namespace . $name;
                 }
 
                 $expected = null;
@@ -184,7 +189,7 @@ class NameCollisionDetector
             }
         }
 
-        return $classes;
+        return $types;
     }
 
     /**

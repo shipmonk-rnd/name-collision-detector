@@ -25,7 +25,7 @@ namespace Foo {
 
     }
 
-    class NamespacedClass2 {
+    interface NamespacedClass2 {
 
     }
 
@@ -37,7 +37,7 @@ namespace Foo {
 }
 
 namespace Foo {
-    class NamespacedClass2 {
+    trait NamespacedClass2 {
 
     }
 

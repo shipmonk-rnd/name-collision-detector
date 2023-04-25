@@ -29,7 +29,7 @@ if ($directories === []) {
 
 try {
     $detector = new NameCollisionDetector($directories, $cwd);
-    $collisions = $detector->getCollidingClasses();
+    $collisions = $detector->getCollidingTypes();
 
 } catch (InvalidPathProvidedException | FileParsingException $e) {
     echo "ERROR: {$e->getMessage()}\n";
