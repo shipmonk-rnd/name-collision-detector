@@ -1,8 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace ShipMonk;
-
-use RuntimeException;
+namespace ShipMonk\NameCollision\Exception;
 
 class InvalidPathProvidedException extends RuntimeException
 {

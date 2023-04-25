@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace ShipMonk;
+namespace ShipMonk\NameCollision;
 
 use DirectoryIterator;
 use Generator;
@@ -8,6 +8,8 @@ use LogicException;
 use ParseError;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use ShipMonk\NameCollision\Exception\FileParsingException;
+use ShipMonk\NameCollision\Exception\InvalidPathProvidedException;
 use function count;
 use function file_get_contents;
 use function in_array;
@@ -38,7 +40,7 @@ use const T_USE;
 use const T_WHITESPACE;
 use const TOKEN_PARSE;
 
-class NameCollisionDetector
+class Detector
 {
 
     /**
@@ -70,6 +72,7 @@ class NameCollisionDetector
 
     /**
      * @return array<string, list<string>>
+     * @throws FileParsingException
      */
     public function getCollidingTypes(): array
     {
@@ -119,8 +122,9 @@ class NameCollisionDetector
      *
      * @license https://github.com/nette/robot-loader/blob/v3.4.0/license.md
      * @return list<string>
+     * @throws FileParsingException
      */
-    public function getTypesInFile(string $file): array
+    private function getTypesInFile(string $file): array
     {
         $code = file_get_contents($file);
 
@@ -134,6 +138,7 @@ class NameCollisionDetector
         $types = [];
 
         try {
+            /** @throws ParseError */
             $tokens = token_get_all($code, TOKEN_PARSE);
         } catch (ParseError $e) {
             throw new FileParsingException("Unable to parse $file: " . $e->getMessage(), $e);

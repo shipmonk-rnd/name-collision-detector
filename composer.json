@@ -27,12 +27,12 @@
     },
     "autoload": {
         "psr-4": {
-            "ShipMonk\\": "src/"
+            "ShipMonk\\NameCollision\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ShipMonk\\": "tests/"
+            "ShipMonk\\NameCollision\\": "tests/"
         }
     },
     "bin": [

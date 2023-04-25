@@ -1,9 +1,9 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 
-use ShipMonk\FileParsingException;
-use ShipMonk\InvalidPathProvidedException;
-use ShipMonk\NameCollisionDetector;
+use ShipMonk\NameCollision\Detector;
+use ShipMonk\NameCollision\Exception\FileParsingException;
+use ShipMonk\NameCollision\Exception\InvalidPathProvidedException;
 
 $autoloadFiles = [
     __DIR__ . '/../vendor/autoload.php',
@@ -28,7 +28,7 @@ if ($directories === []) {
 }
 
 try {
-    $detector = new NameCollisionDetector($directories, $cwd);
+    $detector = new Detector($directories, $cwd);
     $collisions = $detector->getCollidingTypes();
 
 } catch (InvalidPathProvidedException | FileParsingException $e) {

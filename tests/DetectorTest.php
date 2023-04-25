@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace ShipMonk;
+namespace ShipMonk\NameCollision;
 
 use PHPUnit\Framework\TestCase;
 use function fclose;
@@ -9,7 +9,7 @@ use function proc_close;
 use function proc_open;
 use function stream_get_contents;
 
-class NameCollisionDetectorTest extends TestCase
+class DetectorTest extends TestCase
 {
 
     public function testBinScript(): void
@@ -71,7 +71,7 @@ EOF;
 
     public function testCollisionDetection(): void
     {
-        $detector = new NameCollisionDetector([__DIR__ . '/data/sample-collisions'], __DIR__);
+        $detector = new Detector([__DIR__ . '/data/sample-collisions'], __DIR__);
         $collidingClasses = $detector->getCollidingTypes();
 
         self::assertSame(
