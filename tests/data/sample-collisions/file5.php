@@ -1,7 +1,6 @@
 <?php
 
-namespace Foo;
-
+// same use statements as in file3
 use
     function count;
 use
@@ -9,6 +8,4 @@ use
 use
     function Foo\{namespacedFunction};
 use
-    const /* multiline */
-        // single line
-        Foo\{NAMESPACED_CONST, UNIQUE_CONST};
+    const Foo\{NAMESPACED_CONST, UNIQUE_CONST};

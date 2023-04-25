@@ -10,6 +10,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use function count;
 use function file_get_contents;
+use function in_array;
 use function is_array;
 use function is_dir;
 use function ksort;
@@ -33,6 +34,7 @@ use const T_NAMESPACE;
 use const T_NS_SEPARATOR;
 use const T_STRING;
 use const T_TRAIT;
+use const T_USE;
 use const T_WHITESPACE;
 use const TOKEN_PARSE;
 
@@ -137,7 +139,7 @@ class NameCollisionDetector
             throw new FileParsingException("Unable to parse $file: " . $e->getMessage(), $e);
         }
 
-        foreach ($tokens as $token) {
+        foreach ($tokens as $index => $token) {
             if (is_array($token)) {
                 switch ($token[0]) {
                     case T_COMMENT:
@@ -160,6 +162,13 @@ class NameCollisionDetector
                     case T_INTERFACE:
                     case T_TRAIT:
                     case PHP_VERSION_ID < 80100 ? T_CLASS : T_ENUM:
+                        if (
+                            ($token[0] === T_FUNCTION || $token[0] === T_CONST)
+                            && $this->isWithinUseStatement($tokens, $index)
+                        ) {
+                            break;
+                        }
+
                         $expected = $token[0];
                         $name = '';
                         continue 2;
@@ -207,6 +216,32 @@ class NameCollisionDetector
 
             yield $entry->getPathname();
         }
+    }
+
+    /**
+     * Helps to prevent detecting use statements as function/const definitions
+     * - "use function fn"
+     * - "use const FOO"
+     *
+     * Use statement with braces "use Foo\{ function fn }" is filtered out by $level === $minLevel condition above
+     *
+     * @param mixed[] $tokens
+     */
+    private function isWithinUseStatement(array $tokens, int $index): bool
+    {
+        do {
+            $previousToken = $tokens[--$index];
+
+            if (!is_array($previousToken)) {
+                return false;
+            }
+
+            if ($previousToken[0] === T_USE) {
+                return true;
+            }
+        } while (in_array($previousToken[0], [T_COMMENT, T_DOC_COMMENT, T_WHITESPACE], true));
+
+        return false;
     }
 
 }
