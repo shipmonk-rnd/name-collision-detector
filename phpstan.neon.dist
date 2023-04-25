@@ -12,7 +12,18 @@ parameters:
     excludePaths:
         analyseAndScan:
             - tests/data/*
+    exceptions:
+        implicitThrows: false
+        checkedExceptionClasses:
+            - ShipMonk\NameCollision\Exception\RuntimeException
+        check:
+            missingCheckedExceptionInThrows: true
+            tooWideThrowType: true
     tmpDir: cache/phpstan/
     checkMissingCallableSignature: true
     checkUninitializedProperties: true
     checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    ignoreErrors:
+        - # allow exception violations in tests
+            message: '#missing from the PHPDoc @throws tag\.$#'
+            path: tests/*
