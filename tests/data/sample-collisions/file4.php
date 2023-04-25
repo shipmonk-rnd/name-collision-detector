@@ -16,7 +16,14 @@ use Foo\{
 };
 
 class Foo {
+    const GLOBAL_CONST = 1;
     const NAMESPACED_CONST = 1;
+    function globalFunction() {}
     function namespacedFunction() {}
 }
+
+new class {
+    const NAMESPACED_CONST = 1;
+    function namespacedFunction() {}
+};
 
