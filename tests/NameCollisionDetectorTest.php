@@ -15,96 +15,101 @@ class NameCollisionDetectorTest extends TestCase
     public function testBinScript(): void
     {
         $expectedNoDirectory = "ERROR: no directories provided, use e.g. `detect-collisions src tests`\n";
-        $expectedInvalidDirectoryRegex = "~^ERROR: \".*?/tests/nonsense\" does not exist\n$~";
-        $expectedSuccessRegex = <<<'EOF'
-~Checking duplicates of classes and functions and constants in ../src:
+        $expectedInvalidDirectoryRegex = "~^ERROR: Path \".*?/tests/nonsense\" is not directory\n$~";
+        $parsingFailed = "~^ERROR: Unable to parse .*?/tests/data/parse-failure/file1.php: .*?\n$~";
+        $expectedSuccessRegex = '~OK: no name collision found in: .*?/src~';
 
-OK: no name collision found in: .*?/src~
-EOF;
         $space = ' '; // bypass editorconfig checker
         $expectedClasses = <<<EOF
-Checking duplicates of classes in sample-collisions:
+Foo\NAMESPACED_CONST is defined 2 times:
+$space> /data/sample-collisions/file1.php
+$space> /data/sample-collisions/file2.php
 
 Foo\NamespacedClass1 is defined 2 times:
-$space> /sample-collisions/file1.php
-$space> /sample-collisions/file2.php
+$space> /data/sample-collisions/file1.php
+$space> /data/sample-collisions/file2.php
 
 Foo\NamespacedClass2 is defined 2 times:
-$space> /sample-collisions/file2.php
-$space> /sample-collisions/file2.php
+$space> /data/sample-collisions/file2.php
+$space> /data/sample-collisions/file2.php
+
+Foo\\namespacedFunction is defined 2 times:
+$space> /data/sample-collisions/file2.php
+$space> /data/sample-collisions/file2.php
+
+GLOBAL_CONST is defined 2 times:
+$space> /data/sample-collisions/file1.php
+$space> /data/sample-collisions/file2.php
 
 GlobalClass1 is defined 2 times:
-$space> /sample-collisions/file1.php
-$space> /sample-collisions/file2.php
+$space> /data/sample-collisions/file1.php
+$space> /data/sample-collisions/file2.php
 
 GlobalClass2 is defined 2 times:
-$space> /sample-collisions/file2.php
-$space> /sample-collisions/file2.php
+$space> /data/sample-collisions/file2.php
+$space> /data/sample-collisions/file2.php
+
+globalFunction is defined 2 times:
+$space> /data/sample-collisions/file1.php
+$space> /data/sample-collisions/file2.php
 
 
 EOF;
 
-        self::assertSame($expectedClasses, $this->runCommand(__DIR__ . '/../bin/detect-collisions --classes sample-collisions', 1));
-        self::assertSame($expectedNoDirectory, $this->runCommand(__DIR__ . '/../bin/detect-collisions', 255));
-        self::assertSame(1, preg_match($expectedInvalidDirectoryRegex, $this->runCommand(__DIR__ . '/../bin/detect-collisions nonsense', 255)));
-        self::assertSame(1, preg_match($expectedSuccessRegex, $this->runCommand(__DIR__ . '/../bin/detect-collisions ../src', 0)));
+        $regularOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions data/sample-collisions', 1);
+        $parseFailedOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions data/parse-failure', 255);
+        $noDirectoryOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions', 255);
+        $invalidDirectoryOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions nonsense', 255);
+        $successOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions ../src', 0);
+
+        self::assertSame($expectedClasses, $regularOutput);
+        self::assertSame($expectedNoDirectory, $noDirectoryOutput);
+        self::assertSame(1, preg_match($parsingFailed, $parseFailedOutput));
+        self::assertSame(1, preg_match($expectedSuccessRegex, $successOutput));
+        self::assertSame(1, preg_match($expectedInvalidDirectoryRegex, $invalidDirectoryOutput));
     }
 
     public function testCollisionDetection(): void
     {
-        $detector = new NameCollisionDetector([__DIR__ . '/sample-collisions'], __DIR__);
-        $collidingClasses = $detector->getCollidingClasses();
-        $collidingFunctions = $detector->getCollidingFunctions();
-        $collidingConstants = $detector->getCollidingConstants();
-
-        self::assertSame(
-            [
-                'Foo\NamespacedClass1' => [
-                    '/sample-collisions/file1.php',
-                    '/sample-collisions/file2.php',
-                ],
-                'Foo\NamespacedClass2' => [
-                    '/sample-collisions/file2.php',
-                    '/sample-collisions/file2.php',
-                ],
-                'GlobalClass1' => [
-                    '/sample-collisions/file1.php',
-                    '/sample-collisions/file2.php',
-                ],
-                'GlobalClass2' => [
-                    '/sample-collisions/file2.php',
-                    '/sample-collisions/file2.php',
-                ],
-            ],
-            $collidingClasses
-        );
-
-        self::assertSame(
-            [
-                'Foo\namespacedFunction' => [
-                    '/sample-collisions/file2.php',
-                    '/sample-collisions/file2.php',
-                ],
-                'globalFunction' => [
-                    '/sample-collisions/file1.php',
-                    '/sample-collisions/file2.php',
-                ],
-            ],
-            $collidingFunctions
-        );
+        $detector = new NameCollisionDetector([__DIR__ . '/data/sample-collisions'], __DIR__);
+        $collidingClasses = $detector->getCollidingTypes();
 
         self::assertSame(
             [
                 'Foo\NAMESPACED_CONST' => [
-                    '/sample-collisions/file1.php',
-                    '/sample-collisions/file2.php',
+                    '/data/sample-collisions/file1.php',
+                    '/data/sample-collisions/file2.php',
+                ],
+                'Foo\NamespacedClass1' => [
+                    '/data/sample-collisions/file1.php',
+                    '/data/sample-collisions/file2.php',
+                    ],
+                'Foo\NamespacedClass2' => [
+                    '/data/sample-collisions/file2.php',
+                    '/data/sample-collisions/file2.php',
+                ],
+                'Foo\namespacedFunction' => [
+                    '/data/sample-collisions/file2.php',
+                    '/data/sample-collisions/file2.php',
                 ],
                 'GLOBAL_CONST' => [
-                    '/sample-collisions/file1.php',
-                    '/sample-collisions/file2.php',
+                    '/data/sample-collisions/file1.php',
+                    '/data/sample-collisions/file2.php',
+                ],
+                'GlobalClass1' => [
+                    '/data/sample-collisions/file1.php',
+                    '/data/sample-collisions/file2.php',
+                ],
+                'GlobalClass2' => [
+                    '/data/sample-collisions/file2.php',
+                    '/data/sample-collisions/file2.php',
+                ],
+                'globalFunction' => [
+                    '/data/sample-collisions/file1.php',
+                    '/data/sample-collisions/file2.php',
                 ],
             ],
-            $collidingConstants
+            $collidingClasses
         );
     }
 

@@ -2,35 +2,49 @@
 
 namespace ShipMonk;
 
+use DirectoryIterator;
+use Generator;
 use LogicException;
-use Roave\BetterReflection\BetterReflection;
-use Roave\BetterReflection\Reflection\ReflectionClass;
-use Roave\BetterReflection\Reflection\ReflectionConstant;
-use Roave\BetterReflection\Reflection\ReflectionFunction;
-use Roave\BetterReflection\Reflector\ClassReflector;
-use Roave\BetterReflection\Reflector\ConstantReflector;
-use Roave\BetterReflection\Reflector\DefaultReflector;
-use Roave\BetterReflection\Reflector\FunctionReflector;
-use Roave\BetterReflection\SourceLocator\Exception\InvalidDirectory;
-use Roave\BetterReflection\SourceLocator\Exception\InvalidFileInfo;
-use Roave\BetterReflection\SourceLocator\Type\AggregateSourceLocator;
-use Roave\BetterReflection\SourceLocator\Type\AutoloadSourceLocator;
-use Roave\BetterReflection\SourceLocator\Type\DirectoriesSourceLocator;
-use Roave\BetterReflection\SourceLocator\Type\SourceLocator;
-use function class_exists;
+use ParseError;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use function count;
+use function file_get_contents;
+use function in_array;
+use function is_array;
+use function is_dir;
 use function ksort;
 use function preg_quote;
 use function preg_replace;
 use function sort;
+use function substr;
+use function token_get_all;
+use const PHP_VERSION_ID;
+use const T_CLASS;
+use const T_COMMENT;
+use const T_CONST;
+use const T_CURLY_OPEN;
+use const T_DOC_COMMENT;
+use const T_DOLLAR_OPEN_CURLY_BRACES;
+use const T_ENUM;
+use const T_FUNCTION;
+use const T_INTERFACE;
+use const T_NAME_QUALIFIED;
+use const T_NAMESPACE;
+use const T_NS_SEPARATOR;
+use const T_STRING;
+use const T_TRAIT;
+use const T_USE;
+use const T_WHITESPACE;
+use const TOKEN_PARSE;
 
 class NameCollisionDetector
 {
 
     /**
-     * @var SourceLocator
+     * @var list<string>
      */
-    private $sourceLocator;
+    private $directories;
 
     /**
      * @var string|null
@@ -38,101 +52,35 @@ class NameCollisionDetector
     private $cwd;
 
     /**
-     * Based on: https://github.com/Roave/BetterReflection/blob/396a07c9d276cb9ffba581b24b2dadbb542d542e/demo/parsing-whole-directory/example2.php
-     *
      * @param list<string> $directories
      * @param string|null $cwd Path prefix to strip
      * @throws InvalidPathProvidedException
      */
     public function __construct(array $directories, ?string $cwd = null)
     {
-        try {
-            $astLocator = (new BetterReflection())->astLocator();
-            $sourceLocator = new AggregateSourceLocator([
-                new DirectoriesSourceLocator(
-                    $directories,
-                    $astLocator
-                ),
-                new AutoloadSourceLocator($astLocator)
-            ]);
-        } catch (InvalidFileInfo | InvalidDirectory $e) {
-            throw new InvalidPathProvidedException($e);
+        foreach ($directories as $directory) {
+            if (!is_dir($directory)) {
+                throw new InvalidPathProvidedException("Path \"$directory\" is not directory");
+            }
         }
 
-        $this->sourceLocator = $sourceLocator;
+        $this->directories = $directories;
         $this->cwd = $cwd;
     }
 
     /**
      * @return array<string, list<string>>
      */
-    public function getCollidingConstants(): array
-    {
-        return $this->getCollisions($this->reflectAllConstants());
-    }
-
-    /**
-     * @return array<string, list<string>>
-     */
-    public function getCollidingFunctions(): array
-    {
-        return $this->getCollisions($this->reflectAllFunctions());
-    }
-
-    /**
-     * @return array<string, list<string>>
-     */
-    public function getCollidingClasses(): array
-    {
-        return $this->getCollisions($this->reflectAllClasses());
-    }
-
-    /**
-     * @return iterable<ReflectionClass>
-     */
-    private function reflectAllClasses(): iterable
-    {
-        return class_exists(ClassReflector::class)
-            ? (new ClassReflector($this->sourceLocator))->getAllClasses()
-            : (new DefaultReflector($this->sourceLocator))->reflectAllClasses();
-    }
-
-    /**
-     * @return iterable<ReflectionFunction>
-     */
-    private function reflectAllFunctions(): iterable
-    {
-        return class_exists(FunctionReflector::class)
-            ? (new FunctionReflector($this->sourceLocator, new ClassReflector($this->sourceLocator)))->getAllFunctions()
-            : (new DefaultReflector($this->sourceLocator))->reflectAllFunctions();
-    }
-
-    /**
-     * @return iterable<ReflectionConstant>
-     */
-    private function reflectAllConstants(): iterable
-    {
-        return class_exists(ConstantReflector::class)
-            ? (new ConstantReflector($this->sourceLocator, new ClassReflector($this->sourceLocator)))->getAllConstants()
-            : (new DefaultReflector($this->sourceLocator))->reflectAllConstants();
-    }
-
-    /**
-     * @param iterable<ReflectionClass>|iterable<ReflectionFunction>|iterable<ReflectionConstant> $reflections
-     * @return array<string, list<string>>
-     */
-    private function getCollisions(iterable $reflections): array
+    public function getCollidingTypes(): array
     {
         $classToFilesMap = [];
 
-        foreach ($reflections as $reflection) {
-            $className = $reflection->getName();
-
-            if (!isset($classToFilesMap[$className])) {
-                $classToFilesMap[$className] = [];
+        foreach ($this->directories as $directory) {
+            foreach ($this->listPhpFilesIn($directory) as $filePath) {
+                foreach ($this->getTypesInFile($filePath) as $class) {
+                    $classToFilesMap[$class][] = $this->normalizePath($filePath);
+                }
             }
-
-            $classToFilesMap[$className][] = $this->normalizeFileName($reflection->getFileName());
         }
 
         ksort($classToFilesMap);
@@ -149,15 +97,11 @@ class NameCollisionDetector
         return $classToFilesMap;
     }
 
-    private function normalizeFileName(?string $fileName): string
+    private function normalizePath(string $path): string
     {
-        if ($fileName === null) {
-            return 'unknown file';
-        }
-
         if ($this->cwd !== null) {
             $cwdForRegEx = preg_quote($this->cwd, '~');
-            $replacedFileName = preg_replace("~^{$cwdForRegEx}~", '', $fileName);
+            $replacedFileName = preg_replace("~^{$cwdForRegEx}~", '', $path);
 
             if ($replacedFileName === null) {
                 throw new LogicException('Invalid regex, should not happen');
@@ -166,7 +110,138 @@ class NameCollisionDetector
             return $replacedFileName;
         }
 
-        return $fileName;
+        return $path;
+    }
+
+    /**
+     * Searches enums, classes, interfaces, constants, functions and traits in PHP file.
+     * Based on Nette\Loaders\RobotLoader::scanPhp
+     *
+     * @license https://github.com/nette/robot-loader/blob/v3.4.0/license.md
+     * @return list<string>
+     */
+    public function getTypesInFile(string $file): array
+    {
+        $code = file_get_contents($file);
+
+        if ($code === false) {
+            throw new FileParsingException("Unable to get contents of $file");
+        }
+
+        $expected = null;
+        $namespace = $name = '';
+        $level = $minLevel = 0;
+        $types = [];
+
+        try {
+            $tokens = token_get_all($code, TOKEN_PARSE);
+        } catch (ParseError $e) {
+            throw new FileParsingException("Unable to parse $file: " . $e->getMessage(), $e);
+        }
+
+        foreach ($tokens as $index => $token) {
+            if (is_array($token)) {
+                switch ($token[0]) {
+                    case T_COMMENT:
+                    case T_DOC_COMMENT:
+                    case T_WHITESPACE:
+                        continue 2;
+
+                    case T_STRING:
+                    case PHP_VERSION_ID < 80000 ? T_NS_SEPARATOR : T_NAME_QUALIFIED:
+                        if ($expected !== null) {
+                            $name .= $token[1];
+                        }
+
+                        continue 2;
+
+                    case T_CONST:
+                    case T_FUNCTION:
+                    case T_NAMESPACE:
+                    case T_CLASS:
+                    case T_INTERFACE:
+                    case T_TRAIT:
+                    case PHP_VERSION_ID < 80100 ? T_CLASS : T_ENUM:
+                        if (
+                            ($token[0] === T_FUNCTION || $token[0] === T_CONST)
+                            && $this->isWithinUseStatement($tokens, $index)
+                        ) {
+                            break;
+                        }
+
+                        $expected = $token[0];
+                        $name = '';
+                        continue 2;
+
+                    case T_CURLY_OPEN:
+                    case T_DOLLAR_OPEN_CURLY_BRACES:
+                        $level++;
+                }
+            }
+
+            if ($expected !== null) {
+                if ($expected === T_NAMESPACE) {
+                    $namespace = $name !== '' ? $name . '\\' : '';
+                    $minLevel = $token === '{' ? 1 : 0;
+
+                } elseif ($name !== '' && $level === $minLevel) {
+                    $types[] = $namespace . $name;
+                }
+
+                $expected = null;
+            }
+
+            if ($token === '{') {
+                $level++;
+            } elseif ($token === '}') {
+                $level--;
+            }
+        }
+
+        return $types;
+    }
+
+    /**
+     * @return Generator<string>
+     */
+    private function listPhpFilesIn(string $directory): Generator
+    {
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
+
+        foreach ($iterator as $entry) {
+            /** @var DirectoryIterator $entry */
+            if (!$entry->isFile() || !$entry->isReadable() || substr($entry->getFilename(), -4) !== '.php') {
+                continue;
+            }
+
+            yield $entry->getPathname();
+        }
+    }
+
+    /**
+     * Helps to prevent detecting use statements as function/const definitions
+     * - "use function fn"
+     * - "use const FOO"
+     *
+     * Use statement with braces "use Foo\{ function fn }" is filtered out by $level === $minLevel condition above
+     *
+     * @param mixed[] $tokens
+     */
+    private function isWithinUseStatement(array $tokens, int $index): bool
+    {
+        do {
+            $previousToken = $tokens[--$index];
+
+            if (!is_array($previousToken)) {
+                return false;
+            }
+
+            if ($previousToken[0] === T_USE) {
+                return true;
+            }
+        } while (in_array($previousToken[0], [T_COMMENT, T_DOC_COMMENT, T_WHITESPACE], true));
+
+        return false;
     }
 
 }

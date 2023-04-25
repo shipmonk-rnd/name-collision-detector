@@ -11,22 +11,8 @@ parameters:
         - tests
     excludePaths:
         analyseAndScan:
-            - tests/sample-collisions/*
+            - tests/data/*
     tmpDir: cache/phpstan/
     checkMissingCallableSignature: true
     checkUninitializedProperties: true
     checkTooWideReturnTypesInProtectedAndPublicMethods: true
-    ignoreErrors:
-        # we want to support even < PHP 8.0 which requires better-reflection 4.* using different reflectors
-        -
-            message: '#Roave\\BetterReflection\\Reflector\\DefaultReflector#'
-            reportUnmatched: false
-        -
-            message: '#Roave\\BetterReflection\\Reflector\\ClassReflector#'
-            reportUnmatched: false
-        -
-            message: '#Roave\\BetterReflection\\Reflector\\FunctionReflector#'
-            reportUnmatched: false
-        -
-            message: '#Roave\\BetterReflection\\Reflector\\ConstantReflector#'
-            reportUnmatched: false

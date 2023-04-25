@@ -25,7 +25,9 @@ namespace Foo {
 
     }
 
-    class NamespacedClass2 {
+    interface
+        // comment
+        NamespacedClass2 {
 
     }
 
@@ -37,7 +39,7 @@ namespace Foo {
 }
 
 namespace Foo {
-    class NamespacedClass2 {
+    trait/**/NamespacedClass2 {
 
     }
 
