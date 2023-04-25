@@ -40,7 +40,7 @@ use const T_USE;
 use const T_WHITESPACE;
 use const TOKEN_PARSE;
 
-class Detector
+class CollisionDetector
 {
 
     /**

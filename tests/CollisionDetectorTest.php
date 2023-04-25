@@ -9,7 +9,7 @@ use function proc_close;
 use function proc_open;
 use function stream_get_contents;
 
-class DetectorTest extends TestCase
+class CollisionDetectorTest extends TestCase
 {
 
     public function testBinScript(): void
@@ -71,7 +71,7 @@ EOF;
 
     public function testCollisionDetection(): void
     {
-        $detector = new Detector([__DIR__ . '/data/sample-collisions'], __DIR__);
+        $detector = new CollisionDetector([__DIR__ . '/data/sample-collisions'], __DIR__);
         $collidingClasses = $detector->getCollidingTypes();
 
         self::assertSame(

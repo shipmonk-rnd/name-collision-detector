@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 
-use ShipMonk\NameCollision\Detector;
+use ShipMonk\NameCollision\CollisionDetector;
 use ShipMonk\NameCollision\Exception\FileParsingException;
 use ShipMonk\NameCollision\Exception\InvalidPathProvidedException;
 
@@ -28,7 +28,7 @@ if ($directories === []) {
 }
 
 try {
-    $detector = new Detector($directories, $cwd);
+    $detector = new CollisionDetector($directories, $cwd);
     $collisions = $detector->getCollidingTypes();
 
 } catch (InvalidPathProvidedException | FileParsingException $e) {
