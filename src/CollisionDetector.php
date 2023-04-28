@@ -72,7 +72,6 @@ class CollisionDetector
 
     /**
      * @return array<string, list<string>>
-     * @throws FileParsingException
      */
     public function getCollidingTypes(): array
     {
@@ -80,8 +79,12 @@ class CollisionDetector
 
         foreach ($this->directories as $directory) {
             foreach ($this->listPhpFilesIn($directory) as $filePath) {
-                foreach ($this->getTypesInFile($filePath) as $class) {
-                    $classToFilesMap[$class][] = $this->normalizePath($filePath);
+                try {
+                    foreach ($this->getTypesInFile($filePath) as $class) {
+                        $classToFilesMap[$class][] = $this->normalizePath($filePath);
+                    }
+                } catch (FileParsingException $e) {
+                    continue;
                 }
             }
         }

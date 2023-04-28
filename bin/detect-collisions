@@ -31,7 +31,7 @@ try {
     $detector = new CollisionDetector($directories, $cwd);
     $collisions = $detector->getCollidingTypes();
 
-} catch (InvalidPathProvidedException | FileParsingException $e) {
+} catch (InvalidPathProvidedException $e) {
     echo "ERROR: {$e->getMessage()}\n";
     exit(255);
 }

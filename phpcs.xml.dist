@@ -300,7 +300,7 @@
     <rule ref="SlevomatCodingStandard.ControlStructures.NewWithParentheses"/>
     <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceOperator"/>
     <rule ref="SlevomatCodingStandard.Exceptions.DeadCatch"/>
-    <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch"/>
+    <!-- rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch"/ --> <!-- after bumping PHP version -->
     <rule ref="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly"/>
     <rule ref="SlevomatCodingStandard.Functions.DisallowArrowFunction"/>
     <rule ref="SlevomatCodingStandard.Functions.DisallowNamedArguments"/>
