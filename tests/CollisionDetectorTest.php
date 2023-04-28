@@ -15,7 +15,7 @@ class CollisionDetectorTest extends TestCase
     public function testBinScript(): void
     {
         $expectedNoDirectory = "ERROR: no directories provided, use e.g. `detect-collisions src tests`\n";
-        $expectedInvalidDirectoryRegex = "~^ERROR: Path \".*?/tests/nonsense\" is not directory\n$~";
+        $expectedInvalidDirectoryRegex = "~^ERROR: Provided directory to scan \".*?/tests/nonsense\" is not directory\n$~";
         $expectedSuccessRegex = '~OK: no name collision found in: .*?/src~';
 
         $space = ' '; // bypass editorconfig checker
@@ -68,7 +68,13 @@ EOF;
 
     public function testCollisionDetection(): void
     {
-        $detector = new CollisionDetector([__DIR__ . '/data/sample-collisions'], __DIR__);
+        $detector = new CollisionDetector(
+            new DetectionConfig(
+                [__DIR__ . '/data/sample-collisions'],
+                ['.php'],
+                __DIR__
+            )
+        );
         $collidingClasses = $detector->getCollidingTypes();
 
         self::assertSame(

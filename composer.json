@@ -14,7 +14,8 @@
     ],
     "require": {
         "php": "^7.2 || ^8.0",
-        "ext-tokenizer": "*"
+        "ext-tokenizer": "*",
+        "nette/schema": "^1.1.0"
     },
     "require-dev": {
         "editorconfig-checker/editorconfig-checker": "^10.3.0",

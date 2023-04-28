@@ -9,16 +9,15 @@ use ParseError;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ShipMonk\NameCollision\Exception\FileParsingException;
-use ShipMonk\NameCollision\Exception\InvalidPathProvidedException;
 use function count;
 use function file_get_contents;
 use function in_array;
 use function is_array;
-use function is_dir;
 use function ksort;
 use function preg_quote;
 use function preg_replace;
 use function sort;
+use function strlen;
 use function substr;
 use function token_get_all;
 use function token_name;
@@ -49,30 +48,13 @@ class CollisionDetector
     const TYPE_GROUP_CONSTANT = 'const';
 
     /**
-     * @var list<string>
+     * @var DetectionConfig
      */
-    private $directories;
+    private $config;
 
-    /**
-     * @var string|null
-     */
-    private $cwd;
-
-    /**
-     * @param list<string> $directories
-     * @param string|null $cwd Path prefix to strip
-     * @throws InvalidPathProvidedException
-     */
-    public function __construct(array $directories, ?string $cwd = null)
+    public function __construct(DetectionConfig $config)
     {
-        foreach ($directories as $directory) {
-            if (!is_dir($directory)) {
-                throw new InvalidPathProvidedException("Path \"$directory\" is not directory");
-            }
-        }
-
-        $this->directories = $directories;
-        $this->cwd = $cwd;
+        $this->config = $config;
     }
 
     /**
@@ -87,7 +69,7 @@ class CollisionDetector
         ];
         $types = [];
 
-        foreach ($this->directories as $directory) {
+        foreach ($this->config->getScanDirs() as $directory) {
             foreach ($this->listPhpFilesIn($directory) as $filePath) {
                 try {
                     foreach ($this->getTypesInFile($filePath) as $group => $classes) {
@@ -96,7 +78,11 @@ class CollisionDetector
                         }
                     }
                 } catch (FileParsingException $e) {
-                    continue;
+                    if ($this->config->shouldIgnoreParseFailures()) {
+                        continue;
+                    }
+
+                    throw $e;
                 }
             }
         }
@@ -120,18 +106,14 @@ class CollisionDetector
 
     private function normalizePath(string $path): string
     {
-        if ($this->cwd !== null) {
-            $cwdForRegEx = preg_quote($this->cwd, '~');
-            $replacedFileName = preg_replace("~^{$cwdForRegEx}~", '', $path);
+        $cwdForRegEx = preg_quote($this->config->getCurrentDirectory(), '~');
+        $replacedFileName = preg_replace("~^{$cwdForRegEx}~", '', $path);
 
-            if ($replacedFileName === null) {
-                throw new LogicException('Invalid regex, should not happen');
-            }
-
-            return $replacedFileName;
+        if ($replacedFileName === null) {
+            throw new LogicException('Invalid regex, should not happen');
         }
 
-        return $path;
+        return $replacedFileName;
     }
 
     /**
@@ -233,12 +215,23 @@ class CollisionDetector
 
         foreach ($iterator as $entry) {
             /** @var DirectoryIterator $entry */
-            if (!$entry->isFile() || !$entry->isReadable() || substr($entry->getFilename(), -4) !== '.php') {
+            if (!$entry->isFile() || !$this->isExtensionToCheck($entry->getFilename())) {
                 continue;
             }
 
             yield $entry->getPathname();
         }
+    }
+
+    private function isExtensionToCheck(string $filePath): bool
+    {
+        foreach ($this->config->getExtensions() as $extension) {
+            if (substr($filePath, -strlen($extension)) === $extension) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

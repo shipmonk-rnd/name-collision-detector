@@ -2,8 +2,9 @@
 <?php declare(strict_types=1);
 
 use ShipMonk\NameCollision\CollisionDetector;
+use ShipMonk\NameCollision\DetectionConfig;
 use ShipMonk\NameCollision\Exception\FileParsingException;
-use ShipMonk\NameCollision\Exception\InvalidPathProvidedException;
+use ShipMonk\NameCollision\Exception\InvalidConfigException;
 
 $autoloadFiles = [
     __DIR__ . '/../vendor/autoload.php',
@@ -17,23 +18,34 @@ foreach ($autoloadFiles as $autoloadFile) {
     }
 }
 
+/**
+ * @return never
+ */
+$exit = function (string $message): void {
+    echo "ERROR: $message\n";
+    exit(255);
+};
+
 $cwd = getcwd();
 $directories = array_map(static function ($arg) use ($cwd) {
     return $cwd . '/' . $arg;
 }, array_slice($argv, 1));
 
 if ($directories === []) {
-    echo "ERROR: no directories provided, use e.g. `detect-collisions src tests`\n";
-    exit(255);
+    $exit("no directories provided, use e.g. `detect-collisions src tests`");
 }
 
-try {
-    $detector = new CollisionDetector($directories, $cwd);
-    $collisions = $detector->getCollidingTypes();
+$configFilePath = $cwd . "/collision-detector.json";
 
-} catch (InvalidPathProvidedException $e) {
-    echo "ERROR: {$e->getMessage()}\n";
-    exit(255);
+try {
+    $config = file_exists($configFilePath)
+        ? DetectionConfig::fromConfigFile($directories, $cwd, $configFilePath)
+        : DetectionConfig::fromDefaults($directories, $cwd);
+
+    $detector = new CollisionDetector($config);
+    $collisions = $detector->getCollidingTypes();
+} catch (FileParsingException | InvalidConfigException $e) {
+    $exit($e->getMessage());
 }
 
 foreach ($collisions as $name => $filePaths) {

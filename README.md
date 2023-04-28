@@ -27,6 +27,17 @@ GlobalInterface1 is defined 2 times:
  > /tests/sample-collisions/file2.php
 ```
 
+## Configuration:
+If file named `collision-detector.json` is present within current working directory, its contents are taken as configuration options. Possible config options:
+```json
+{
+    "scanDirs": ["src", "tests"], // directories to scan, relative to CWD
+    "extensions": [".php"], // file extensions to parse
+    "ignoreParseFailures": false // skip files with parse errors or not
+}
+```
+While `scanDirs` within config file has priority over those provided by CLI arguments.
+
 ## Reasoning
 Having colliding classes within project can cause crazy headaches while debugging why something works only sometimes.
 Typically, you have PSR-4 autoloading solving this problem for you, but there are cases (like [PHPStan rules test files](https://github.com/shipmonk-rnd/phpstan-rules/tree/master/tests/Rule/data)) where you want to write any code (with [classmap](https://getcomposer.org/doc/04-schema.md#classmap) autoloading).
