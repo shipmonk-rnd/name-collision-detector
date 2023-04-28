@@ -27,9 +27,7 @@ $exit = function (string $message): void {
 };
 
 $cwd = getcwd();
-$directories = array_map(static function ($arg) use ($cwd) {
-    return $cwd . '/' . $arg;
-}, array_slice($argv, 1));
+$directories = array_slice($argv, 1);
 
 if ($directories === []) {
     $exit("no directories provided, use e.g. `detect-collisions src tests`");

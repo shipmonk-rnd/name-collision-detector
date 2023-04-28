@@ -66,7 +66,7 @@ class DetectorConfigTest extends TestCase
             'resultingScanDirs' => null,
             'resultingExtensions' => null,
             'resultingIgnoreParseFailure' => null,
-            'error' => 'Provided directory to scan "not-a-dir" is not directory',
+            'error' => '/tests/not-a-dir" is not directory',
         ];
 
         yield 'parsing failure' => [
@@ -113,7 +113,7 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => ['.'],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/empty.json',
-            'resultingScanDirs' => ['.'],
+            'resultingScanDirs' => [__DIR__ . '/.'],
             'resultingExtensions' => ['.php'],
             'resultingIgnoreParseFailure' => false,
             'error' => null,
@@ -123,17 +123,17 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => [],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/valid.json',
-            'resultingScanDirs' => ['.', '..'],
+            'resultingScanDirs' => [__DIR__ . '/.', __DIR__ . '/..'],
             'resultingExtensions' => ['.php8'],
             'resultingIgnoreParseFailure' => true,
             'error' => null,
         ];
 
-        yield 'config paths have priority' => [
+        yield 'CLI dirs have priority' => [
             'cliArguments' => ['data'],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/valid.json',
-            'resultingScanDirs' => ['.', '..'],
+            'resultingScanDirs' => [__DIR__ . '/data'],
             'resultingExtensions' => ['.php8'],
             'resultingIgnoreParseFailure' => true,
             'error' => null,

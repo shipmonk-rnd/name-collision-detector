@@ -70,7 +70,7 @@ EOF;
     {
         $detector = new CollisionDetector(
             new DetectionConfig(
-                [__DIR__ . '/data/sample-collisions'],
+                ['data/sample-collisions'],
                 ['.php'],
                 __DIR__
             )
@@ -134,7 +134,7 @@ EOF;
         fclose($pipes[1]);
 
         $exitCode = proc_close($procHandle);
-        self::assertSame($expectedExitCode, $exitCode, 'Output was: ' . $output);
+        self::assertSame($expectedExitCode, $exitCode, "Output was:\n" . $output);
 
         return $output;
     }

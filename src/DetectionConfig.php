@@ -43,7 +43,7 @@ class DetectionConfig
     private $ignoreParseFailures;
 
     /**
-     * @param list<string> $scanDirs
+     * @param list<string> $scanDirs Relative to $currentDirectory
      * @param list<string> $extensions
      * @throws InvalidConfigException
      */
@@ -58,13 +58,19 @@ class DetectionConfig
             throw new InvalidConfigException('At least one directory to scan must be provided.');
         }
 
+        $absoluteDirectories = [];
+
         foreach ($scanDirs as $directory) {
-            if (!is_dir($directory)) {
-                throw new InvalidConfigException("Provided directory to scan \"$directory\" is not directory");
+            $absoluteDirectoryPath = $currentDirectory . '/' . $directory;
+
+            if (!is_dir($absoluteDirectoryPath)) {
+                throw new InvalidConfigException("Provided directory to scan \"$absoluteDirectoryPath\" is not directory");
             }
+
+            $absoluteDirectories[] = $absoluteDirectoryPath;
         }
 
-        $this->directories = $scanDirs;
+        $this->directories = $absoluteDirectories;
         $this->currentDirectory = $currentDirectory;
         $this->ignoreParseFailures = $ignoreParseFailures;
         $this->extensions = $extensions;
@@ -130,13 +136,13 @@ class DetectionConfig
             $processor = new SchemaProcessor();
 
             /** @var array{scanDirs: list<string>, extensions: list<string>, ignoreParseFailures: bool} $normalizedConfig */
-            $normalizedConfig = $processor->process(self::getConfigSchema($providedDirectories), $configData);
+            $normalizedConfig = $processor->process(self::getConfigSchema(), $configData);
         } catch (ValidationException $e) {
             throw new InvalidConfigException($e->getMessage(), $e);
         }
 
         return new self(
-            $normalizedConfig['scanDirs'],
+            $providedDirectories === [] ? $normalizedConfig['scanDirs'] : $providedDirectories,
             $normalizedConfig['extensions'],
             $currentDirectory,
             $normalizedConfig['ignoreParseFailures']
@@ -169,14 +175,11 @@ class DetectionConfig
         return $this->extensions;
     }
 
-    /**
-     * @param list<string> $providedDirectories
-     */
-    private static function getConfigSchema(array $providedDirectories): Structure
+    private static function getConfigSchema(): Structure
     {
         return Expect::structure([
             'ignoreParseFailures' => Expect::bool()->default(false),
-            'scanDirs' => Expect::listOf(Expect::string())->mergeDefaults(false)->default($providedDirectories),
+            'scanDirs' => Expect::listOf(Expect::string())->mergeDefaults(false)->default([]),
             'extensions' => Expect::listOf(Expect::string())->mergeDefaults(false)->default(['.php']),
         ])->castTo('array');
     }

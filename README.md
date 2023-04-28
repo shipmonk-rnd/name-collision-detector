@@ -36,7 +36,7 @@ If file named `collision-detector.json` is present within current working direct
     "ignoreParseFailures": false // skip files with parse errors or not
 }
 ```
-While `scanDirs` within config file has priority over those provided by CLI arguments.
+Directories provided by CLI arguments have priority over those in `scanDirs`.
 
 ## Reasoning
 Having colliding classes within project can cause crazy headaches while debugging why something works only sometimes.
