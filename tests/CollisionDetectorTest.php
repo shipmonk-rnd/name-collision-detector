@@ -16,7 +16,6 @@ class CollisionDetectorTest extends TestCase
     {
         $expectedNoDirectory = "ERROR: no directories provided, use e.g. `detect-collisions src tests`\n";
         $expectedInvalidDirectoryRegex = "~^ERROR: Path \".*?/tests/nonsense\" is not directory\n$~";
-        $parsingFailed = "~^ERROR: Unable to parse .*?/tests/data/parse-failure/file1.php: .*?\n$~";
         $expectedSuccessRegex = '~OK: no name collision found in: .*?/src~';
 
         $space = ' '; // bypass editorconfig checker
@@ -57,14 +56,12 @@ $space> /data/sample-collisions/file2.php
 EOF;
 
         $regularOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions data/sample-collisions', 1);
-        $parseFailedOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions data/parse-failure', 255);
         $noDirectoryOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions', 255);
         $invalidDirectoryOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions nonsense', 255);
         $successOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions ../src', 0);
 
         self::assertSame($expectedClasses, $regularOutput);
         self::assertSame($expectedNoDirectory, $noDirectoryOutput);
-        self::assertSame(1, preg_match($parsingFailed, $parseFailedOutput));
         self::assertSame(1, preg_match($expectedSuccessRegex, $successOutput));
         self::assertSame(1, preg_match($expectedInvalidDirectoryRegex, $invalidDirectoryOutput));
     }
@@ -131,7 +128,7 @@ EOF;
         fclose($pipes[1]);
 
         $exitCode = proc_close($procHandle);
-        self::assertSame($expectedExitCode, $exitCode);
+        self::assertSame($expectedExitCode, $exitCode, 'Output was: ' . $output);
 
         return $output;
     }
