@@ -9,7 +9,7 @@ namespace {
 
     }
 
-    class GlobalClass2 {
+    enum GlobalClass2 {
 
     }
 
