@@ -59,6 +59,7 @@ class CollisionDetector
 
     /**
      * @return array<string, list<string>>
+     * @throws FileParsingException
      */
     public function getCollidingTypes(): array
     {
