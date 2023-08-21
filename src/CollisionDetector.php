@@ -273,7 +273,7 @@ class CollisionDetector
     private function detectGroupType(int $tokenId): string
     {
         switch ($tokenId) {
-            case T_ENUM:
+            case PHP_VERSION_ID < 80100 ? T_CLASS : T_ENUM:
             case T_CLASS:
             case T_TRAIT:
             case T_INTERFACE:
