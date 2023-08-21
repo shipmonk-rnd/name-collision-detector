@@ -21,6 +21,7 @@ use function preg_replace;
 use function sort;
 use function substr;
 use function token_get_all;
+use function token_name;
 use const PHP_VERSION_ID;
 use const T_CLASS;
 use const T_COMMENT;
@@ -42,6 +43,10 @@ use const TOKEN_PARSE;
 
 class CollisionDetector
 {
+
+    const TYPE_GROUP_CLASS = 'class';
+    const TYPE_GROUP_FUNCTION = 'function';
+    const TYPE_GROUP_CONSTANT = 'const';
 
     /**
      * @var list<string>
@@ -75,13 +80,20 @@ class CollisionDetector
      */
     public function getCollidingTypes(): array
     {
-        $classToFilesMap = [];
+        $groups = [
+            self::TYPE_GROUP_CLASS,
+            self::TYPE_GROUP_FUNCTION,
+            self::TYPE_GROUP_CONSTANT,
+        ];
+        $types = [];
 
         foreach ($this->directories as $directory) {
             foreach ($this->listPhpFilesIn($directory) as $filePath) {
                 try {
-                    foreach ($this->getTypesInFile($filePath) as $class) {
-                        $classToFilesMap[$class][] = $this->normalizePath($filePath);
+                    foreach ($this->getTypesInFile($filePath) as $group => $classes) {
+                        foreach ($classes as $class) {
+                            $types[$group][$class][] = $this->normalizePath($filePath);
+                        }
                     }
                 } catch (FileParsingException $e) {
                     continue;
@@ -89,18 +101,21 @@ class CollisionDetector
             }
         }
 
-        ksort($classToFilesMap);
+        $collidingTypes = [];
 
-        foreach ($classToFilesMap as $className => $fileNames) {
-            if (count($fileNames) === 1) {
-                unset($classToFilesMap[$className]);
-            } else {
-                sort($fileNames);
-                $classToFilesMap[$className] = $fileNames;
+        foreach ($groups as $group) {
+            $classToFilesMap = $types[$group] ?? [];
+            ksort($classToFilesMap);
+
+            foreach ($classToFilesMap as $className => $fileNames) {
+                if (count($fileNames) > 1) {
+                    sort($fileNames);
+                    $collidingTypes[$className] = $fileNames;
+                }
             }
         }
 
-        return $classToFilesMap;
+        return $collidingTypes;
     }
 
     private function normalizePath(string $path): string
@@ -124,7 +139,7 @@ class CollisionDetector
      * Based on Nette\Loaders\RobotLoader::scanPhp
      *
      * @license https://github.com/nette/robot-loader/blob/v3.4.0/license.md
-     * @return list<string>
+     * @return array<self::TYPE_GROUP_*, list<string>>
      * @throws FileParsingException
      */
     private function getTypesInFile(string $file): array
@@ -193,7 +208,7 @@ class CollisionDetector
                     $minLevel = $token === '{' ? 1 : 0;
 
                 } elseif ($name !== '' && $level === $minLevel) {
-                    $types[] = $namespace . $name;
+                    $types[$this->detectGroupType($expected)][] = $namespace . $name;
                 }
 
                 $expected = null;
@@ -250,6 +265,29 @@ class CollisionDetector
         } while (in_array($previousToken[0], [T_COMMENT, T_DOC_COMMENT, T_WHITESPACE], true));
 
         return false;
+    }
+
+    /**
+     * @return self::TYPE_GROUP_*
+     */
+    private function detectGroupType(int $tokenId): string
+    {
+        switch ($tokenId) {
+            case PHP_VERSION_ID < 80100 ? T_CLASS : T_ENUM:
+            case T_CLASS:
+            case T_TRAIT:
+            case T_INTERFACE:
+                return self::TYPE_GROUP_CLASS;
+
+            case T_FUNCTION:
+                return self::TYPE_GROUP_FUNCTION;
+
+            case T_CONST:
+                return self::TYPE_GROUP_CONSTANT;
+
+            default:
+                throw new LogicException("Unexpected token #$tokenId: " . token_name($tokenId));
+        }
     }
 
 }

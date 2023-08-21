@@ -20,24 +20,12 @@ class CollisionDetectorTest extends TestCase
 
         $space = ' '; // bypass editorconfig checker
         $expectedClasses = <<<EOF
-Foo\NAMESPACED_CONST is defined 2 times:
-$space> /data/sample-collisions/file1.php
-$space> /data/sample-collisions/file2.php
-
 Foo\NamespacedClass1 is defined 2 times:
 $space> /data/sample-collisions/file1.php
 $space> /data/sample-collisions/file2.php
 
 Foo\NamespacedClass2 is defined 2 times:
 $space> /data/sample-collisions/file2.php
-$space> /data/sample-collisions/file2.php
-
-Foo\\namespacedFunction is defined 2 times:
-$space> /data/sample-collisions/file2.php
-$space> /data/sample-collisions/file2.php
-
-GLOBAL_CONST is defined 2 times:
-$space> /data/sample-collisions/file1.php
 $space> /data/sample-collisions/file2.php
 
 GlobalClass1 is defined 2 times:
@@ -48,7 +36,19 @@ GlobalClass2 is defined 2 times:
 $space> /data/sample-collisions/file2.php
 $space> /data/sample-collisions/file2.php
 
+Foo\\namespacedFunction is defined 2 times:
+$space> /data/sample-collisions/file2.php
+$space> /data/sample-collisions/file2.php
+
 globalFunction is defined 2 times:
+$space> /data/sample-collisions/file1.php
+$space> /data/sample-collisions/file2.php
+
+Foo\NAMESPACED_CONST is defined 2 times:
+$space> /data/sample-collisions/file1.php
+$space> /data/sample-collisions/file2.php
+
+GLOBAL_CONST is defined 2 times:
 $space> /data/sample-collisions/file1.php
 $space> /data/sample-collisions/file2.php
 
@@ -73,24 +73,12 @@ EOF;
 
         self::assertSame(
             [
-                'Foo\NAMESPACED_CONST' => [
-                    '/data/sample-collisions/file1.php',
-                    '/data/sample-collisions/file2.php',
-                ],
                 'Foo\NamespacedClass1' => [
                     '/data/sample-collisions/file1.php',
                     '/data/sample-collisions/file2.php',
                     ],
                 'Foo\NamespacedClass2' => [
                     '/data/sample-collisions/file2.php',
-                    '/data/sample-collisions/file2.php',
-                ],
-                'Foo\namespacedFunction' => [
-                    '/data/sample-collisions/file2.php',
-                    '/data/sample-collisions/file2.php',
-                ],
-                'GLOBAL_CONST' => [
-                    '/data/sample-collisions/file1.php',
                     '/data/sample-collisions/file2.php',
                 ],
                 'GlobalClass1' => [
@@ -101,7 +89,19 @@ EOF;
                     '/data/sample-collisions/file2.php',
                     '/data/sample-collisions/file2.php',
                 ],
+                'Foo\namespacedFunction' => [
+                    '/data/sample-collisions/file2.php',
+                    '/data/sample-collisions/file2.php',
+                ],
                 'globalFunction' => [
+                    '/data/sample-collisions/file1.php',
+                    '/data/sample-collisions/file2.php',
+                ],
+                'Foo\NAMESPACED_CONST' => [
+                    '/data/sample-collisions/file1.php',
+                    '/data/sample-collisions/file2.php',
+                ],
+                'GLOBAL_CONST' => [
                     '/data/sample-collisions/file1.php',
                     '/data/sample-collisions/file2.php',
                 ],
