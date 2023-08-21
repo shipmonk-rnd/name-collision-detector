@@ -25,12 +25,12 @@ class DetectionConfig
     /**
      * @var list<string>
      */
-    private $directories;
+    private $scanPaths;
 
     /**
      * @var list<string>
      */
-    private $extensions;
+    private $fileExtensions;
 
     /**
      * @var string
@@ -43,37 +43,37 @@ class DetectionConfig
     private $ignoreParseFailures;
 
     /**
-     * @param list<string> $scanDirs Relative to $currentDirectory
-     * @param list<string> $extensions
+     * @param list<string> $scanPaths Relative to $currentDirectory
+     * @param list<string> $fileExtensions
      * @throws InvalidConfigException
      */
     public function __construct(
-        array $scanDirs,
-        array $extensions,
+        array $scanPaths,
+        array $fileExtensions,
         string $currentDirectory,
         bool $ignoreParseFailures = false
     )
     {
-        if ($scanDirs === []) {
+        if ($scanPaths === []) {
             throw new InvalidConfigException('At least one directory to scan must be provided.');
         }
 
-        $absoluteDirectories = [];
+        $absoluteScanPaths = [];
 
-        foreach ($scanDirs as $directory) {
-            $absoluteDirectoryPath = $currentDirectory . '/' . $directory;
+        foreach ($scanPaths as $scanPath) {
+            $absolutePath = $currentDirectory . '/' . $scanPath;
 
-            if (!is_dir($absoluteDirectoryPath)) {
-                throw new InvalidConfigException("Provided directory to scan \"$absoluteDirectoryPath\" is not directory");
+            if (!is_dir($absolutePath) && !is_file($absolutePath)) {
+                throw new InvalidConfigException("Provided directory to scan \"$absolutePath\" is not directory nor a file");
             }
 
-            $absoluteDirectories[] = $absoluteDirectoryPath;
+            $absoluteScanPaths[] = $absolutePath;
         }
 
-        $this->directories = $absoluteDirectories;
+        $this->scanPaths = $absoluteScanPaths;
         $this->currentDirectory = $currentDirectory;
         $this->ignoreParseFailures = $ignoreParseFailures;
-        $this->extensions = $extensions;
+        $this->fileExtensions = $fileExtensions;
     }
 
     /**
@@ -135,15 +135,15 @@ class DetectionConfig
         try {
             $processor = new SchemaProcessor();
 
-            /** @var array{scanDirs: list<string>, extensions: list<string>, ignoreParseFailures: bool} $normalizedConfig */
+            /** @var array{scanPaths: list<string>, fileExtensions: list<string>, ignoreParseFailures: bool} $normalizedConfig */
             $normalizedConfig = $processor->process(self::getConfigSchema(), $configData);
         } catch (ValidationException $e) {
             throw new InvalidConfigException($e->getMessage(), $e);
         }
 
         return new self(
-            $providedDirectories === [] ? $normalizedConfig['scanDirs'] : $providedDirectories,
-            $normalizedConfig['extensions'],
+            $providedDirectories === [] ? $normalizedConfig['scanPaths'] : $providedDirectories,
+            $normalizedConfig['fileExtensions'],
             $currentDirectory,
             $normalizedConfig['ignoreParseFailures']
         );
@@ -152,9 +152,9 @@ class DetectionConfig
     /**
      * @return list<string>
      */
-    public function getScanDirs(): array
+    public function getScanPaths(): array
     {
-        return $this->directories;
+        return $this->scanPaths;
     }
 
     public function getCurrentDirectory(): string
@@ -170,17 +170,17 @@ class DetectionConfig
     /**
      * @return list<string>
      */
-    public function getExtensions(): array
+    public function getFileExtensions(): array
     {
-        return $this->extensions;
+        return $this->fileExtensions;
     }
 
     private static function getConfigSchema(): Structure
     {
         return Expect::structure([
             'ignoreParseFailures' => Expect::bool()->default(false),
-            'scanDirs' => Expect::listOf(Expect::string())->mergeDefaults(false)->default([]),
-            'extensions' => Expect::listOf(Expect::string())->mergeDefaults(false)->default(['.php']),
+            'scanPaths' => Expect::listOf(Expect::string())->mergeDefaults(false)->default([]),
+            'fileExtensions' => Expect::listOf(Expect::string())->mergeDefaults(false)->default(['.php']),
         ])->castTo('array');
     }
 

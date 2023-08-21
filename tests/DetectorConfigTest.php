@@ -11,16 +11,16 @@ class DetectorConfigTest extends TestCase
 
     /**
      * @param list<string> $cliArguments
-     * @param list<string>|null $resultingScanDirs
-     * @param list<string>|null $resultingExtensions
+     * @param list<string>|null $resultingScanPaths
+     * @param list<string>|null $resultingFileExtensions
      * @dataProvider provideConfigs
      */
     public function testConfig(
         array $cliArguments,
         string $cwd,
         string $configPath,
-        ?array $resultingScanDirs,
-        ?array $resultingExtensions,
+        ?array $resultingScanPaths,
+        ?array $resultingFileExtensions,
         ?bool $resultingIgnoreParseFailure,
         ?string $error
     ): void
@@ -28,8 +28,8 @@ class DetectorConfigTest extends TestCase
         try {
             $config = DetectionConfig::fromConfigFile($cliArguments, $cwd, $configPath);
             self::assertNull($error);
-            self::assertSame($resultingScanDirs, $config->getScanDirs());
-            self::assertSame($resultingExtensions, $config->getExtensions());
+            self::assertSame($resultingScanPaths, $config->getScanPaths());
+            self::assertSame($resultingFileExtensions, $config->getFileExtensions());
             self::assertSame($resultingIgnoreParseFailure, $config->shouldIgnoreParseFailures());
 
         } catch (InvalidConfigException $e) {
@@ -37,8 +37,8 @@ class DetectorConfigTest extends TestCase
                 throw $e;
             }
 
-            self::assertNull($resultingScanDirs);
-            self::assertNull($resultingExtensions);
+            self::assertNull($resultingScanPaths);
+            self::assertNull($resultingFileExtensions);
             self::assertNull($resultingIgnoreParseFailure);
             self::assertStringContainsString($error, $e->getMessage());
         }
@@ -53,8 +53,8 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => [],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/empty.json',
-            'resultingScanDirs' => null,
-            'resultingExtensions' => null,
+            'resultingScanPaths' => null,
+            'resultingFileExtensions' => null,
             'resultingIgnoreParseFailure' => null,
             'error' => 'At least one directory to scan must be provided.',
         ];
@@ -63,8 +63,8 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => ['not-a-dir'],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/empty.json',
-            'resultingScanDirs' => null,
-            'resultingExtensions' => null,
+            'resultingScanPaths' => null,
+            'resultingFileExtensions' => null,
             'resultingIgnoreParseFailure' => null,
             'error' => '/tests/not-a-dir" is not directory',
         ];
@@ -73,8 +73,8 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => ['.'],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/not-json.json',
-            'resultingScanDirs' => null,
-            'resultingExtensions' => null,
+            'resultingScanPaths' => null,
+            'resultingFileExtensions' => null,
             'resultingIgnoreParseFailure' => null,
             'error' => 'Failure while parsing JSON',
         ];
@@ -83,8 +83,8 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => ['.'],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/unknown-config.json',
-            'resultingScanDirs' => null,
-            'resultingExtensions' => null,
+            'resultingScanPaths' => null,
+            'resultingFileExtensions' => null,
             'resultingIgnoreParseFailure' => null,
             'error' => "Unexpected item 'unknown'",
         ];
@@ -93,8 +93,8 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => ['.'],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/bad-shape.json',
-            'resultingScanDirs' => null,
-            'resultingExtensions' => null,
+            'resultingScanPaths' => null,
+            'resultingFileExtensions' => null,
             'resultingIgnoreParseFailure' => null,
             'error' => "Unexpected item '0'",
         ];
@@ -103,8 +103,8 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => ['.'],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/invalid-type.json',
-            'resultingScanDirs' => null,
-            'resultingExtensions' => null,
+            'resultingScanPaths' => null,
+            'resultingFileExtensions' => null,
             'resultingIgnoreParseFailure' => null,
             'error' => "The item 'scanDirs' expects to be list, '.' given.",
         ];
@@ -113,8 +113,8 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => ['.'],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/empty.json',
-            'resultingScanDirs' => [__DIR__ . '/.'],
-            'resultingExtensions' => ['.php'],
+            'resultingScanPaths' => [__DIR__ . '/.'],
+            'resultingFileExtensions' => ['.php'],
             'resultingIgnoreParseFailure' => false,
             'error' => null,
         ];
@@ -123,18 +123,18 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => [],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/valid.json',
-            'resultingScanDirs' => [__DIR__ . '/.', __DIR__ . '/..'],
-            'resultingExtensions' => ['.php8'],
+            'resultingScanPaths' => [__DIR__ . '/.', __DIR__ . '/..'],
+            'resultingFileExtensions' => ['.php8'],
             'resultingIgnoreParseFailure' => true,
             'error' => null,
         ];
 
-        yield 'CLI dirs have priority' => [
+        yield 'CLI paths have priority' => [
             'cliArguments' => ['data'],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/valid.json',
-            'resultingScanDirs' => [__DIR__ . '/data'],
-            'resultingExtensions' => ['.php8'],
+            'resultingScanPaths' => [__DIR__ . '/data'],
+            'resultingFileExtensions' => ['.php8'],
             'resultingIgnoreParseFailure' => true,
             'error' => null,
         ];

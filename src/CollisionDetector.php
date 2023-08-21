@@ -13,6 +13,7 @@ use function count;
 use function file_get_contents;
 use function in_array;
 use function is_array;
+use function is_file;
 use function ksort;
 use function preg_quote;
 use function preg_replace;
@@ -70,7 +71,7 @@ class CollisionDetector
         ];
         $types = [];
 
-        foreach ($this->config->getScanDirs() as $directory) {
+        foreach ($this->config->getScanPaths() as $directory) {
             foreach ($this->listPhpFilesIn($directory) as $filePath) {
                 try {
                     foreach ($this->getTypesInFile($filePath) as $group => $classes) {
@@ -210,9 +211,14 @@ class CollisionDetector
     /**
      * @return Generator<string>
      */
-    private function listPhpFilesIn(string $directory): Generator
+    private function listPhpFilesIn(string $path): Generator
     {
-        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
+        if (is_file($path) && $this->isExtensionToCheck($path)) {
+            yield $path;
+            return;
+        }
+
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
 
         foreach ($iterator as $entry) {
             /** @var DirectoryIterator $entry */
@@ -226,7 +232,7 @@ class CollisionDetector
 
     private function isExtensionToCheck(string $filePath): bool
     {
-        foreach ($this->config->getExtensions() as $extension) {
+        foreach ($this->config->getFileExtensions() as $extension) {
             if (substr($filePath, -strlen($extension)) === $extension) {
                 return true;
             }
