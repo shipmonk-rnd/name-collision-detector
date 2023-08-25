@@ -103,7 +103,7 @@ EOF;
         ];
 
         $cwd = __DIR__;
-        $procHandle = proc_open($command, $desc, $pipes, $cwd, null, ['bypass_shell' => true]);
+        $procHandle = proc_open($command, $desc, $pipes, $cwd);
         self::assertNotFalse($procHandle);
 
         $output = stream_get_contents($pipes[1]);
