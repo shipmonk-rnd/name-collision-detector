@@ -47,10 +47,10 @@ $space> /data/multiple-files/colliding1.php:6
 $space> /data/multiple-files/colliding2.php:6
 EOF;
 
-        $regularOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions data/multiple-files', 1);
-        $noDirectoryOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions', 255);
-        $invalidDirectoryOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions nonsense', 255);
         $successOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions ../src', 0);
+        $regularOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions data/multiple-files', 1);
+        $invalidDirectoryOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions nonsense', 255);
+        $noDirectoryOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions', 255);
 
         self::assertSame($expectedClasses, $regularOutput);
         self::assertSame($expectedNoDirectory, $noDirectoryOutput);
