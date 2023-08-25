@@ -9,6 +9,7 @@ use function preg_match;
 use function proc_close;
 use function proc_open;
 use function stream_get_contents;
+use const PHP_VERSION_ID;
 
 class CollisionDetectorTest extends TestCase
 {
@@ -177,10 +178,23 @@ EOF;
                     new FileLine('/data/basic-cases/groups.php', 3),
                     new FileLine('/data/basic-cases/groups.php', 4),
                     new FileLine('/data/basic-cases/groups.php', 5),
-                    new FileLine('/data/basic-cases/groups.php', 6),
                 ],
             ],
         ];
+
+        if (PHP_VERSION_ID >= 80100) {
+            yield [
+                'paths' => ['data/basic-cases/groups-with-enum.php'],
+                'expectedResults' => [
+                    'Go' => [
+                        new FileLine('/data/basic-cases/groups-with-enum.php', 3),
+                        new FileLine('/data/basic-cases/groups-with-enum.php', 4),
+                        new FileLine('/data/basic-cases/groups-with-enum.php', 5),
+                        new FileLine('/data/basic-cases/groups-with-enum.php', 6),
+                    ],
+                ],
+            ];
+        }
 
         yield [
             'paths' => ['data/basic-cases/multiple-namespaces.php'],
