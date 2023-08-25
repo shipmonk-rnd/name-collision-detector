@@ -1,7 +1,7 @@
 {
     "ignoreParseFailures": true,
-    "scanDirs": [
+    "scanPaths": [
         ".", ".."
     ],
-    "extensions": [".php8"]
+    "fileExtensions": [".php8"]
 }

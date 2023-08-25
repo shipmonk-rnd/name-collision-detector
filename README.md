@@ -31,8 +31,8 @@ GlobalInterface1 is defined 2 times:
 If file named `collision-detector.json` is present within current working directory, its contents are taken as configuration options. Possible config options:
 ```json5
 {
-    "scanDirs": ["src", "tests"], // directories to scan, relative to CWD
-    "extensions": [".php"], // file extensions to parse
+    "scanPaths": ["src", "tests"], // files/directories to scan, relative to CWD
+    "fileExtensions": [".php"], // file extensions to parse
     "ignoreParseFailures": false // skip files with parse errors or not
 }
 ```

@@ -17,11 +17,11 @@ use function is_file;
 use function ksort;
 use function preg_quote;
 use function preg_replace;
-use function sort;
 use function strlen;
 use function substr;
 use function token_get_all;
 use function token_name;
+use function usort;
 use const PHP_VERSION_ID;
 use const T_CLASS;
 use const T_COMMENT;
@@ -59,7 +59,7 @@ class CollisionDetector
     }
 
     /**
-     * @return array<string, list<string>>
+     * @return array<string, list<FileLine>>
      * @throws FileParsingException
      */
     public function getCollidingTypes(): array
@@ -75,8 +75,8 @@ class CollisionDetector
             foreach ($this->listPhpFilesIn($directory) as $filePath) {
                 try {
                     foreach ($this->getTypesInFile($filePath) as $group => $classes) {
-                        foreach ($classes as $class) {
-                            $types[$group][$class][] = $this->normalizePath($filePath);
+                        foreach ($classes as [$line, $class]) {
+                            $types[$group][$class][] = new FileLine($this->normalizePath($filePath), $line);
                         }
                     }
                 } catch (FileParsingException $e) {
@@ -95,10 +95,19 @@ class CollisionDetector
             $classToFilesMap = $types[$group] ?? [];
             ksort($classToFilesMap);
 
-            foreach ($classToFilesMap as $className => $fileNames) {
-                if (count($fileNames) > 1) {
-                    sort($fileNames);
-                    $collidingTypes[$className] = $fileNames;
+            foreach ($classToFilesMap as $className => $fileLines) {
+                if (count($fileLines) > 1) {
+                    usort($fileLines, static function (FileLine $a, FileLine $b): int {
+                        $pathDiff = $a->getFilePath() <=> $b->getFilePath();
+
+                        if ($pathDiff === 0) {
+                            return $a->getLine() <=> $b->getLine();
+                        }
+
+                        return $pathDiff;
+                    });
+
+                    $collidingTypes[$className] = $fileLines;
                 }
             }
         }
@@ -123,7 +132,7 @@ class CollisionDetector
      * Based on Nette\Loaders\RobotLoader::scanPhp
      *
      * @license https://github.com/nette/robot-loader/blob/v3.4.0/license.md
-     * @return array<self::TYPE_GROUP_*, list<string>>
+     * @return array<self::TYPE_GROUP_*, list<array{int, string}>>
      * @throws FileParsingException
      */
     private function getTypesInFile(string $file): array
@@ -134,6 +143,7 @@ class CollisionDetector
             throw new FileParsingException("Unable to get contents of $file");
         }
 
+        $line = -1;
         $expected = null;
         $namespace = $name = '';
         $level = $minLevel = 0;
@@ -177,6 +187,7 @@ class CollisionDetector
                         }
 
                         $expected = $token[0];
+                        $line = $token[2];
                         $name = '';
                         continue 2;
 
@@ -192,7 +203,7 @@ class CollisionDetector
                     $minLevel = $token === '{' ? 1 : 0;
 
                 } elseif ($name !== '' && $level === $minLevel) {
-                    $types[$this->detectGroupType($expected)][] = $namespace . $name;
+                    $types[$this->detectGroupType($expected)][] = [$line, $namespace . $name];
                 }
 
                 $expected = null;

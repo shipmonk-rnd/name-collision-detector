@@ -106,7 +106,7 @@ class DetectorConfigTest extends TestCase
             'resultingScanPaths' => null,
             'resultingFileExtensions' => null,
             'resultingIgnoreParseFailure' => null,
-            'error' => "The item 'scanDirs' expects to be list, '.' given.",
+            'error' => "The item 'scanPaths' expects to be list, '.' given.",
         ];
 
         yield 'empty json means falls back to defaults' => [

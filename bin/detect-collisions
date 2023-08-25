@@ -46,11 +46,11 @@ try {
     $exit($e->getMessage());
 }
 
-foreach ($collisions as $name => $filePaths) {
-    $count = count($filePaths);
+foreach ($collisions as $name => $fileLines) {
+    $count = count($fileLines);
     echo "$name is defined $count times:\n";
-    foreach ($filePaths as $filePath) {
-        echo " > $filePath\n";
+    foreach ($fileLines as $fileLine) {
+        echo " > {$fileLine->getFilePath()}:{$fileLine->getLine()}\n";
     }
     echo "\n";
 }

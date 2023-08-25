@@ -22,28 +22,28 @@ class CollisionDetectorTest extends TestCase
         $space = ' '; // bypass editorconfig checker
         $expectedClasses = <<<EOF
 Foo\NamespacedClass is defined 2 times:
-$space> /data/multiple-files/colliding1.php
-$space> /data/multiple-files/colliding3.php
+$space> /data/multiple-files/colliding1.php:11
+$space> /data/multiple-files/colliding3.php:5
 
 GlobalClass is defined 2 times:
-$space> /data/multiple-files/colliding1.php
-$space> /data/multiple-files/colliding2.php
+$space> /data/multiple-files/colliding1.php:4
+$space> /data/multiple-files/colliding2.php:4
 
 Foo\\namespacedFunction is defined 2 times:
-$space> /data/multiple-files/colliding1.php
-$space> /data/multiple-files/colliding3.php
+$space> /data/multiple-files/colliding1.php:12
+$space> /data/multiple-files/colliding3.php:6
 
 globalFunction is defined 2 times:
-$space> /data/multiple-files/colliding1.php
-$space> /data/multiple-files/colliding2.php
+$space> /data/multiple-files/colliding1.php:5
+$space> /data/multiple-files/colliding2.php:5
 
 Foo\NAMESPACED_CONST is defined 2 times:
-$space> /data/multiple-files/colliding1.php
-$space> /data/multiple-files/colliding3.php
+$space> /data/multiple-files/colliding1.php:13
+$space> /data/multiple-files/colliding3.php:7
 
 GLOBAL_CONST is defined 2 times:
-$space> /data/multiple-files/colliding1.php
-$space> /data/multiple-files/colliding2.php
+$space> /data/multiple-files/colliding1.php:6
+$space> /data/multiple-files/colliding2.php:6
 
 
 EOF;
@@ -88,7 +88,7 @@ EOF;
         );
         $collidingClasses = $detector->getCollidingTypes();
 
-        self::assertSame(
+        self::assertEquals(
             $expectedResults,
             $collidingClasses
         );
@@ -136,16 +136,16 @@ EOF;
             'paths' => ['data/basic-cases/simple.php'],
             'expectedResults' => [
                 'DuplicateClass' => [
-                    '/data/basic-cases/simple.php',
-                    '/data/basic-cases/simple.php',
+                    new FileLine('/data/basic-cases/simple.php', 3),
+                    new FileLine('/data/basic-cases/simple.php', 4),
                 ],
                 'duplicateFunction' => [
-                    '/data/basic-cases/simple.php',
-                    '/data/basic-cases/simple.php',
+                    new FileLine('/data/basic-cases/simple.php', 6),
+                    new FileLine('/data/basic-cases/simple.php', 7),
                 ],
                 'DUPLICATE_CONST' => [
-                    '/data/basic-cases/simple.php',
-                    '/data/basic-cases/simple.php',
+                    new FileLine('/data/basic-cases/simple.php', 9),
+                    new FileLine('/data/basic-cases/simple.php', 10),
                 ],
             ],
         ];
@@ -154,8 +154,8 @@ EOF;
             'paths' => ['data/basic-cases/html.php'],
             'expectedResults' => [
                 'Bar' => [
-                    '/data/basic-cases/html.php',
-                    '/data/basic-cases/html.php',
+                    new FileLine('/data/basic-cases/html.php', 3),
+                    new FileLine('/data/basic-cases/html.php', 9),
                 ],
             ],
         ];
@@ -164,8 +164,8 @@ EOF;
             'paths' => ['data/fatal-error/code.php'],
             'expectedResults' => [
                 'Exists' => [
-                    '/data/fatal-error/code.php',
-                    '/data/fatal-error/code.php',
+                    new FileLine('/data/fatal-error/code.php', 6),
+                    new FileLine('/data/fatal-error/code.php', 7),
                 ],
             ],
         ];
@@ -174,10 +174,10 @@ EOF;
             'paths' => ['data/basic-cases/groups.php'],
             'expectedResults' => [
                 'Go' => [
-                    '/data/basic-cases/groups.php',
-                    '/data/basic-cases/groups.php',
-                    '/data/basic-cases/groups.php',
-                    '/data/basic-cases/groups.php',
+                    new FileLine('/data/basic-cases/groups.php', 3),
+                    new FileLine('/data/basic-cases/groups.php', 4),
+                    new FileLine('/data/basic-cases/groups.php', 5),
+                    new FileLine('/data/basic-cases/groups.php', 6),
                 ],
             ],
         ];
@@ -186,8 +186,8 @@ EOF;
             'paths' => ['data/basic-cases/multiple-namespaces.php'],
             'expectedResults' => [
                 'Foo\X' => [
-                    '/data/basic-cases/multiple-namespaces.php',
-                    '/data/basic-cases/multiple-namespaces.php',
+                    new FileLine('/data/basic-cases/multiple-namespaces.php', 5),
+                    new FileLine('/data/basic-cases/multiple-namespaces.php', 9),
                 ],
             ],
         ];
@@ -196,8 +196,8 @@ EOF;
             'paths' => ['data/basic-cases/multiple-namespaces-braced.php'],
             'expectedResults' => [
                 'Foo\X' => [
-                    '/data/basic-cases/multiple-namespaces-braced.php',
-                    '/data/basic-cases/multiple-namespaces-braced.php',
+                    new FileLine('/data/basic-cases/multiple-namespaces-braced.php', 4),
+                    new FileLine('/data/basic-cases/multiple-namespaces-braced.php', 8),
                 ],
             ],
         ];
@@ -206,28 +206,28 @@ EOF;
             'paths' => ['data/multiple-files'],
             'expectedResults' => [
                 'Foo\NamespacedClass' => [
-                    '/data/multiple-files/colliding1.php',
-                    '/data/multiple-files/colliding3.php',
+                    new FileLine('/data/multiple-files/colliding1.php', 11),
+                    new FileLine('/data/multiple-files/colliding3.php', 5),
                 ],
                 'GlobalClass' => [
-                    '/data/multiple-files/colliding1.php',
-                    '/data/multiple-files/colliding2.php',
+                    new FileLine('/data/multiple-files/colliding1.php', 4),
+                    new FileLine('/data/multiple-files/colliding2.php', 4),
                 ],
                 'Foo\namespacedFunction' => [
-                    '/data/multiple-files/colliding1.php',
-                    '/data/multiple-files/colliding3.php',
+                    new FileLine('/data/multiple-files/colliding1.php', 12),
+                    new FileLine('/data/multiple-files/colliding3.php', 6),
                 ],
                 'globalFunction' => [
-                    '/data/multiple-files/colliding1.php',
-                    '/data/multiple-files/colliding2.php',
+                    new FileLine('/data/multiple-files/colliding1.php', 5),
+                    new FileLine('/data/multiple-files/colliding2.php', 5),
                 ],
                 'Foo\NAMESPACED_CONST' => [
-                    '/data/multiple-files/colliding1.php',
-                    '/data/multiple-files/colliding3.php',
+                    new FileLine('/data/multiple-files/colliding1.php', 13),
+                    new FileLine('/data/multiple-files/colliding3.php', 7),
                 ],
                 'GLOBAL_CONST' => [
-                    '/data/multiple-files/colliding1.php',
-                    '/data/multiple-files/colliding2.php',
+                    new FileLine('/data/multiple-files/colliding1.php', 6),
+                    new FileLine('/data/multiple-files/colliding2.php', 6),
                 ],
             ],
         ];
