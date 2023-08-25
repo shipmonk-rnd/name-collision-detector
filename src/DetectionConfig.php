@@ -3,6 +3,7 @@
 namespace ShipMonk\NameCollision;
 
 use JsonException;
+use LogicException;
 use Nette\Schema\Elements\Structure;
 use Nette\Schema\Expect;
 use Nette\Schema\Processor as SchemaProcessor;
@@ -16,6 +17,7 @@ use function is_readable;
 use function json_decode;
 use function json_last_error;
 use function json_last_error_msg;
+use function realpath;
 use const DIRECTORY_SEPARATOR;
 use const JSON_ERROR_NONE;
 use const JSON_PRESERVE_ZERO_FRACTION;
@@ -68,7 +70,12 @@ class DetectionConfig
                 throw new InvalidConfigException("Provided directory to scan \"$absolutePath\" is not directory nor a file");
             }
 
-            $absoluteScanPaths[] = $absolutePath;
+            $absoluteRealPath = realpath($absolutePath);
+            if ($absoluteRealPath === false) {
+                throw new LogicException("Unable to realpath \"$absolutePath\" even though it is existing file or dir");
+            }
+
+            $absoluteScanPaths[] = $absoluteRealPath;
         }
 
         $this->scanPaths = $absoluteScanPaths;

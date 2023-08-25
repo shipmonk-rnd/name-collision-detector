@@ -5,6 +5,7 @@ namespace ShipMonk\NameCollision;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use ShipMonk\NameCollision\Exception\InvalidConfigException;
+use function realpath;
 
 class DetectorConfigTest extends TestCase
 {
@@ -66,7 +67,7 @@ class DetectorConfigTest extends TestCase
             'resultingScanPaths' => null,
             'resultingFileExtensions' => null,
             'resultingIgnoreParseFailure' => null,
-            'error' => '/tests/not-a-dir" is not directory',
+            'error' => 'not-a-dir" is not directory nor a file',
         ];
 
         yield 'parsing failure' => [
@@ -113,7 +114,7 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => ['.'],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/empty.json',
-            'resultingScanPaths' => [__DIR__ . '/.'],
+            'resultingScanPaths' => [realpath(__DIR__ . '/.')],
             'resultingFileExtensions' => ['.php'],
             'resultingIgnoreParseFailure' => false,
             'error' => null,
@@ -123,7 +124,7 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => [],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/valid.json',
-            'resultingScanPaths' => [__DIR__ . '/.', __DIR__ . '/..'],
+            'resultingScanPaths' => [realpath(__DIR__ . '/.'), realpath(__DIR__ . '/..')],
             'resultingFileExtensions' => ['.php8'],
             'resultingIgnoreParseFailure' => true,
             'error' => null,
@@ -133,7 +134,7 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => ['data'],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/valid.json',
-            'resultingScanPaths' => [__DIR__ . '/data'],
+            'resultingScanPaths' => [realpath(__DIR__ . '/data')],
             'resultingFileExtensions' => ['.php8'],
             'resultingIgnoreParseFailure' => true,
             'error' => null,
