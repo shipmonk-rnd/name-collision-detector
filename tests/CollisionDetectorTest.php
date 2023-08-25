@@ -9,7 +9,6 @@ use function preg_match;
 use function proc_close;
 use function proc_open;
 use function stream_get_contents;
-use const PHP_OS_FAMILY;
 use const PHP_VERSION_ID;
 
 class CollisionDetectorTest extends TestCase
@@ -99,8 +98,8 @@ EOF;
     private function runCommand(string $command, int $expectedExitCode): string
     {
         $desc = [
-            PHP_OS_FAMILY === 'Windows' ? ['socket'] : ['pipe', 'r'],
-            PHP_OS_FAMILY === 'Windows' ? ['socket'] : ['pipe', 'w'],
+            ['pipe', 'r'],
+            ['pipe', 'w'],
         ];
 
         $cwd = __DIR__;

@@ -71,7 +71,6 @@ class DetectionConfig
             }
 
             $absoluteRealPath = realpath($absolutePath);
-
             if ($absoluteRealPath === false) {
                 throw new LogicException("Unable to realpath \"$absolutePath\" even though it is existing file or dir");
             }
