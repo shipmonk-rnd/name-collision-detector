@@ -4,11 +4,11 @@ namespace ShipMonk\NameCollision;
 
 use PHPUnit\Framework\TestCase;
 use ShipMonk\NameCollision\Exception\FileParsingException;
-use function chdir;
-use function exec;
-use function implode;
+use function fclose;
 use function preg_match;
-use function trim;
+use function proc_close;
+use function proc_open;
+use function stream_get_contents;
 use const PHP_VERSION_ID;
 
 class CollisionDetectorTest extends TestCase
@@ -16,8 +16,8 @@ class CollisionDetectorTest extends TestCase
 
     public function testBinScript(): void
     {
-        $expectedNoDirectory = 'ERROR: no directories provided, use e.g. `detect-collisions src tests`';
-        $expectedInvalidDirectoryRegex = '~^ERROR: Provided directory to scan ".*?/tests/nonsense" is not directory nor a file$~';
+        $expectedNoDirectory = "ERROR: no directories provided, use e.g. `detect-collisions src tests`\n";
+        $expectedInvalidDirectoryRegex = "~^ERROR: Provided directory to scan \".*?/tests/nonsense\" is not directory nor a file\n$~";
         $expectedSuccessRegex = '~OK: no name collision found in: .*?/src~';
 
         $space = ' '; // bypass editorconfig checker
@@ -45,6 +45,8 @@ $space> /data/multiple-files/colliding3.php:7
 GLOBAL_CONST is defined 2 times:
 $space> /data/multiple-files/colliding1.php:6
 $space> /data/multiple-files/colliding2.php:6
+
+
 EOF;
 
         $successOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions ../src', 0);
@@ -95,15 +97,25 @@ EOF;
 
     private function runCommand(string $command, int $expectedExitCode): string
     {
-        chdir(__DIR__);
-        $executed = exec($command, $output, $exitCode);
-        self::assertNotFalse($executed);
+        $desc = [
+            ['pipe', 'r'],
+            ['pipe', 'w'],
+        ];
 
-        $outputString = implode("\n", $output);
+        $cwd = __DIR__;
+        $procHandle = proc_open($command, $desc, $pipes, $cwd);
+        self::assertNotFalse($procHandle);
 
-        self::assertSame($expectedExitCode, $exitCode, "Output was:\n" . $outputString);
+        $output = stream_get_contents($pipes[1]);
+        self::assertNotFalse($output);
 
-        return trim($outputString);
+        fclose($pipes[0]);
+        fclose($pipes[1]);
+
+        $exitCode = proc_close($procHandle);
+        self::assertSame($expectedExitCode, $exitCode, "Output was:\n" . $output);
+
+        return $output;
     }
 
     /**
