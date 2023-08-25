@@ -100,6 +100,7 @@ EOF;
         $desc = [
             ['pipe', 'r'],
             ['pipe', 'w'],
+            ['pipe', 'w'],
         ];
 
         $cwd = __DIR__;
@@ -107,13 +108,21 @@ EOF;
         self::assertNotFalse($procHandle);
 
         $output = stream_get_contents($pipes[1]);
+        $errorOutput = stream_get_contents($pipes[2]);
         self::assertNotFalse($output);
+        self::assertNotFalse($errorOutput);
 
-        fclose($pipes[0]);
-        fclose($pipes[1]);
+        foreach ($pipes as $pipe) {
+            fclose($pipe);
+        }
 
         $exitCode = proc_close($procHandle);
-        self::assertSame($expectedExitCode, $exitCode, "Output was:\n" . $output);
+        self::assertSame(
+            $expectedExitCode,
+            $exitCode,
+            "Output was:\n" . $output . "\n" .
+            "Error was:\n" . $errorOutput . "\n"
+        );
 
         return $output;
     }
