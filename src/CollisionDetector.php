@@ -17,7 +17,6 @@ use function is_file;
 use function ksort;
 use function preg_quote;
 use function preg_replace;
-use function str_replace;
 use function strlen;
 use function substr;
 use function token_get_all;
@@ -125,7 +124,7 @@ class CollisionDetector
             throw new LogicException('Invalid regex, should not happen');
         }
 
-        return str_replace('\\', '/', $replacedFileName);
+        return $replacedFileName;
     }
 
     /**

@@ -16,6 +16,7 @@ use function is_readable;
 use function json_decode;
 use function json_last_error;
 use function json_last_error_msg;
+use const DIRECTORY_SEPARATOR;
 use const JSON_ERROR_NONE;
 use const JSON_PRESERVE_ZERO_FRACTION;
 
@@ -61,7 +62,7 @@ class DetectionConfig
         $absoluteScanPaths = [];
 
         foreach ($scanPaths as $scanPath) {
-            $absolutePath = $currentDirectory . '/' . $scanPath;
+            $absolutePath = $currentDirectory . DIRECTORY_SEPARATOR . $scanPath;
 
             if (!is_dir($absolutePath) && !is_file($absolutePath)) {
                 throw new InvalidConfigException("Provided directory to scan \"$absolutePath\" is not directory nor a file");
