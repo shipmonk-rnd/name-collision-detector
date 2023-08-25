@@ -8,7 +8,6 @@ use function fclose;
 use function preg_match;
 use function proc_close;
 use function proc_open;
-use function str_replace;
 use function stream_get_contents;
 use const PHP_VERSION_ID;
 
@@ -55,7 +54,7 @@ EOF;
         $invalidDirectoryOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions nonsense', 255);
         $noDirectoryOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions', 255);
 
-        self::assertSame($expectedClasses, str_replace("\r\n", "\n", $regularOutput));
+        self::assertSame($expectedClasses, $regularOutput);
         self::assertSame($expectedNoDirectory, $noDirectoryOutput);
         self::assertSame(1, preg_match($expectedSuccessRegex, $successOutput));
         self::assertSame(1, preg_match($expectedInvalidDirectoryRegex, $invalidDirectoryOutput));

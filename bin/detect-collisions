@@ -22,7 +22,7 @@ foreach ($autoloadFiles as $autoloadFile) {
  * @return never
  */
 $exit = function (string $message): void {
-    echo "ERROR: $message\n";
+    echo "ERROR: $message" . PHP_EOL;
     exit(255);
 };
 
@@ -48,15 +48,15 @@ try {
 
 foreach ($collisions as $name => $fileLines) {
     $count = count($fileLines);
-    echo "$name is defined $count times:\n";
+    echo "$name is defined $count times:" . PHP_EOL;
     foreach ($fileLines as $fileLine) {
-        echo " > {$fileLine->getFilePath()}:{$fileLine->getLine()}\n";
+        echo " > {$fileLine->getFilePath()}:{$fileLine->getLine()}" . PHP_EOL;
     }
-    echo "\n";
+    echo PHP_EOL;
 }
 
 if ($collisions === []) {
-    echo "OK: no name collision found in: " . implode(', ', $directories) . "\n";
+    echo "OK: no name collision found in: " . implode(', ', $directories) . PHP_EOL;
 }
 
 exit(count($collisions) > 0 ? 1 : 0);
