@@ -18,8 +18,8 @@ class CollisionDetectorTest extends TestCase
     public function testBinScript(): void
     {
         $expectedNoDirectory = 'ERROR: no directories provided, use e.g. `detect-collisions src tests`' . PHP_EOL;
-        $expectedInvalidDirectoryRegex = '~^ERROR: Provided directory to scan ".*?/tests/nonsense" is not directory nor a file' . PHP_EOL . '$~';
-        $expectedSuccessRegex = '~OK: no name collision found in: .*?/src~';
+        $expectedInvalidDirectoryRegex = '~^ERROR: Provided directory to scan ".*?nonsense" is not directory nor a file' . PHP_EOL . '$~';
+        $expectedSuccessRegex = '~OK: no name collision found in: .*?src~';
 
         $space = ' '; // bypass editorconfig checker
         $expectedClasses = <<<EOF
