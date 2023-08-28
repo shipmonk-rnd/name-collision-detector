@@ -9,6 +9,7 @@ use Nette\Schema\Expect;
 use Nette\Schema\Processor as SchemaProcessor;
 use Nette\Schema\ValidationException;
 use ShipMonk\NameCollision\Exception\InvalidConfigException;
+use function dirname;
 use function extension_loaded;
 use function file_get_contents;
 use function is_dir;
@@ -46,9 +47,8 @@ class DetectionConfig
     private $ignoreParseFailures;
 
     /**
-     * @param list<string> $scanPaths Relative to $currentDirectory
+     * @param list<string> $scanPaths Absolute paths
      * @param list<string> $fileExtensions
-     * @throws InvalidConfigException
      */
     public function __construct(
         array $scanPaths,
@@ -57,29 +57,13 @@ class DetectionConfig
         bool $ignoreParseFailures = false
     )
     {
-        if ($scanPaths === []) {
-            throw new InvalidConfigException('At least one directory to scan must be provided.');
-        }
-
-        $absoluteScanPaths = [];
-
         foreach ($scanPaths as $scanPath) {
-            $absolutePath = $currentDirectory . DIRECTORY_SEPARATOR . $scanPath;
-
-            if (!is_dir($absolutePath) && !is_file($absolutePath)) {
-                throw new InvalidConfigException("Provided directory to scan \"$absolutePath\" is not directory nor a file");
+            if (!is_dir($scanPath) && !is_file($scanPath)) {
+                throw new LogicException("Expected absolute path of existing file or dir, '$scanPath' found.");
             }
-
-            $absoluteRealPath = realpath($absolutePath);
-
-            if ($absoluteRealPath === false) {
-                throw new LogicException("Unable to realpath \"$absolutePath\" even though it is existing file or dir");
-            }
-
-            $absoluteScanPaths[] = $absoluteRealPath;
         }
 
-        $this->scanPaths = $absoluteScanPaths;
+        $this->scanPaths = $scanPaths;
         $this->currentDirectory = $currentDirectory;
         $this->ignoreParseFailures = $ignoreParseFailures;
         $this->fileExtensions = $fileExtensions;
@@ -122,16 +106,36 @@ class DetectionConfig
             throw new InvalidConfigException("Failure while parsing JSON in $configFilePath: " . json_last_error_msg());
         }
 
-        return self::fromConfigData($providedDirectories, $currentDirectory, $configArray);
+        return self::fromConfigData($providedDirectories, $currentDirectory, dirname($configFilePath), $configArray);
     }
 
     /**
-     * @param list<string> $providedDirectories
+     * @param list<string> $providedPaths
      * @throws InvalidConfigException
      */
-    public static function fromDefaults(array $providedDirectories, string $currentDirectory): self
+    public static function fromDefaults(array $providedPaths, string $currentDirectory): self
     {
-        return self::fromConfigData($providedDirectories, $currentDirectory, []);
+        return self::fromConfigData($providedPaths, $currentDirectory, $currentDirectory, []);
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    private static function joinPath(string $directory, string $path): string
+    {
+        $absolutePath = $directory . DIRECTORY_SEPARATOR . $path;
+
+        if (!is_dir($absolutePath) && !is_file($absolutePath)) {
+            throw new InvalidConfigException("Provided directory to scan \"$absolutePath\" is not directory nor a file");
+        }
+
+        $absoluteRealPath = realpath($absolutePath);
+
+        if ($absoluteRealPath === false) {
+            throw new LogicException("Unable to realpath \"$absolutePath\" even though it is existing file or dir");
+        }
+
+        return $absoluteRealPath;
     }
 
     /**
@@ -139,7 +143,12 @@ class DetectionConfig
      * @param mixed $configData
      * @throws InvalidConfigException
      */
-    private static function fromConfigData(array $providedDirectories, string $currentDirectory, $configData): self
+    private static function fromConfigData(
+        array $providedDirectories,
+        string $currentDirectory,
+        string $configFileDirectory,
+        $configData
+    ): self
     {
         try {
             $processor = new SchemaProcessor();
@@ -150,8 +159,20 @@ class DetectionConfig
             throw new InvalidConfigException($e->getMessage(), $e);
         }
 
+        $absoluteScanPaths = [];
+        $sourcePaths = $providedDirectories === []
+            ? $normalizedConfig['scanPaths']
+            : $providedDirectories;
+        $pathDirectory = $providedDirectories === []
+            ? $configFileDirectory
+            : $currentDirectory;
+
+        foreach ($sourcePaths as $paths) {
+            $absoluteScanPaths[] = self::joinPath($pathDirectory, $paths);
+        }
+
         return new self(
-            $providedDirectories === [] ? $normalizedConfig['scanPaths'] : $providedDirectories,
+            $absoluteScanPaths,
             $normalizedConfig['fileExtensions'],
             $currentDirectory,
             $normalizedConfig['ignoreParseFailures']

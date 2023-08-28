@@ -29,16 +29,16 @@ $exit = function (string $message): void {
 $cwd = getcwd();
 $directories = array_slice($argv, 1);
 
-if ($directories === []) {
-    $exit("no directories provided, use e.g. `detect-collisions src tests`");
-}
-
 $configFilePath = $cwd . "/collision-detector.json";
 
 try {
     $config = file_exists($configFilePath)
         ? DetectionConfig::fromConfigFile($directories, $cwd, $configFilePath)
         : DetectionConfig::fromDefaults($directories, $cwd);
+
+    if ($config->getScanPaths() === []) {
+        $exit("No directories provided, use e.g. `detect-collisions src tests` or setup scanPaths in collision-detector.json");
+    }
 
     $detector = new CollisionDetector($config);
     $collisions = $detector->getCollidingTypes();
@@ -56,7 +56,7 @@ foreach ($collisions as $name => $fileLines) {
 }
 
 if ($collisions === []) {
-    echo "OK: no name collision found in: " . implode(', ', $directories) . PHP_EOL;
+    echo "OK: no name collision found". PHP_EOL;
 }
 
 exit(count($collisions) > 0 ? 1 : 0);

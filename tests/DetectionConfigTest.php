@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 use ShipMonk\NameCollision\Exception\InvalidConfigException;
 use function realpath;
 
-class DetectorConfigTest extends TestCase
+class DetectionConfigTest extends TestCase
 {
 
     /**
@@ -54,10 +54,10 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => [],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/empty.json',
-            'resultingScanPaths' => null,
-            'resultingFileExtensions' => null,
-            'resultingIgnoreParseFailure' => null,
-            'error' => 'At least one directory to scan must be provided.',
+            'resultingScanPaths' => [],
+            'resultingFileExtensions' => ['.php'],
+            'resultingIgnoreParseFailure' => false,
+            'error' => null,
         ];
 
         yield 'non-existing directory' => [
@@ -124,7 +124,7 @@ class DetectorConfigTest extends TestCase
             'cliArguments' => [],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/valid.json',
-            'resultingScanPaths' => [realpath(__DIR__ . '/.'), realpath(__DIR__ . '/..')],
+            'resultingScanPaths' => [__DIR__ . '/data/config-files'],
             'resultingFileExtensions' => ['.php8'],
             'resultingIgnoreParseFailure' => true,
             'error' => null,

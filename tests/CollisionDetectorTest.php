@@ -17,9 +17,9 @@ class CollisionDetectorTest extends TestCase
 
     public function testBinScript(): void
     {
-        $expectedNoDirectory = 'ERROR: no directories provided, use e.g. `detect-collisions src tests`' . PHP_EOL;
+        $expectedNoDirectory = 'ERROR: No directories provided, use e.g. `detect-collisions src tests` or setup scanPaths in collision-detector.json' . PHP_EOL;
         $expectedInvalidDirectoryRegex = '~^ERROR: Provided directory to scan ".*?nonsense" is not directory nor a file' . PHP_EOL . '$~';
-        $expectedSuccessRegex = '~OK: no name collision found in: .*?src~';
+        $expectedSuccessRegex = '~OK: no name collision found~';
 
         $space = ' '; // bypass editorconfig checker
         $expectedClasses = <<<EOF
@@ -65,7 +65,7 @@ EOF;
     {
         $detector = new CollisionDetector(
             new DetectionConfig(
-                ['data/parse-error/code.php'],
+                [__DIR__ . '/data/parse-error/code.php'],
                 ['.php'],
                 __DIR__
             )
@@ -134,17 +134,17 @@ EOF;
     public function provideCases(): iterable
     {
         yield [
-            'paths' => ['data/allowed-duplicates'],
+            'paths' => [__DIR__ . '/data/allowed-duplicates'],
             'expectedResults' => [],
         ];
 
         yield [
-            'paths' => ['data/use-statement'], // basically tests that isWithinUseStatement is working properly
+            'paths' => [__DIR__ . '/data/use-statement'], // basically tests that isWithinUseStatement is working properly
             'expectedResults' => [],
         ];
 
         yield [
-            'paths' => ['data/basic-cases/simple.php'],
+            'paths' => [__DIR__ . '/data/basic-cases/simple.php'],
             'expectedResults' => [
                 'DuplicateClass' => [
                     new FileLine('/data/basic-cases/simple.php', 3),
@@ -162,7 +162,7 @@ EOF;
         ];
 
         yield [
-            'paths' => ['data/basic-cases/html.php'],
+            'paths' => [__DIR__ . '/data/basic-cases/html.php'],
             'expectedResults' => [
                 'Bar' => [
                     new FileLine('/data/basic-cases/html.php', 3),
@@ -172,7 +172,7 @@ EOF;
         ];
 
         yield [
-            'paths' => ['data/fatal-error/code.php'],
+            'paths' => [__DIR__ . '/data/fatal-error/code.php'],
             'expectedResults' => [
                 'Exists' => [
                     new FileLine('/data/fatal-error/code.php', 6),
@@ -182,7 +182,7 @@ EOF;
         ];
 
         yield [
-            'paths' => ['data/basic-cases/groups.php'],
+            'paths' => [__DIR__ . '/data/basic-cases/groups.php'],
             'expectedResults' => [
                 'Go' => [
                     new FileLine('/data/basic-cases/groups.php', 3),
@@ -194,7 +194,7 @@ EOF;
 
         if (PHP_VERSION_ID >= 80100) {
             yield [
-                'paths' => ['data/basic-cases/groups-with-enum.php'],
+                'paths' => [__DIR__ . '/data/basic-cases/groups-with-enum.php'],
                 'expectedResults' => [
                     'Go' => [
                         new FileLine('/data/basic-cases/groups-with-enum.php', 3),
@@ -207,7 +207,7 @@ EOF;
         }
 
         yield [
-            'paths' => ['data/basic-cases/multiple-namespaces.php'],
+            'paths' => [__DIR__ . '/data/basic-cases/multiple-namespaces.php'],
             'expectedResults' => [
                 'Foo\X' => [
                     new FileLine('/data/basic-cases/multiple-namespaces.php', 5),
@@ -217,7 +217,7 @@ EOF;
         ];
 
         yield [
-            'paths' => ['data/basic-cases/multiple-namespaces-braced.php'],
+            'paths' => [__DIR__ . '/data/basic-cases/multiple-namespaces-braced.php'],
             'expectedResults' => [
                 'Foo\X' => [
                     new FileLine('/data/basic-cases/multiple-namespaces-braced.php', 4),
@@ -227,7 +227,7 @@ EOF;
         ];
 
         yield [
-            'paths' => ['data/multiple-files'],
+            'paths' => [__DIR__ . '/data/multiple-files'],
             'expectedResults' => [
                 'Foo\NamespacedClass' => [
                     new FileLine('/data/multiple-files/colliding1.php', 11),

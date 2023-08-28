@@ -13,7 +13,7 @@ composer require --dev shipmonk/name-collision-detector
 ## Usage:
 Check duplicate types:
 ```sh
-vendor/bin/detect-collisions dir1 dir2 dir3
+vendor/bin/detect-collisions dir1 dir2 dir3 # relative to cwd
 ```
 
 Example output:
@@ -31,12 +31,12 @@ GlobalInterface1 is defined 2 times:
 If file named `collision-detector.json` is present within current working directory, its contents are taken as configuration options. Possible config options:
 ```json5
 {
-    "scanPaths": ["src", "tests"], // files/directories to scan, relative to CWD
+    "scanPaths": ["src", "tests"], // files/directories to scan, relative config file directory
     "fileExtensions": [".php"], // file extensions to parse
     "ignoreParseFailures": false // skip files with parse errors or not
 }
 ```
-Directories provided by CLI arguments have priority over those in `scanDirs`.
+Paths provided by CLI arguments have priority over those in `scanDirs`.
 
 ## Reasoning
 Having colliding classes within project can cause crazy headaches while debugging why something works only sometimes.
