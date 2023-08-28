@@ -2,6 +2,8 @@
 
 namespace ShipMonk\NameCollision;
 
+use function str_replace;
+
 class FileLine
 {
 
@@ -17,7 +19,7 @@ class FileLine
 
     public function __construct(string $filePath, int $line)
     {
-        $this->filePath = $filePath;
+        $this->filePath = str_replace('\\', '/', $filePath);
         $this->line = $line;
     }
 
