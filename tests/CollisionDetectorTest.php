@@ -66,6 +66,7 @@ EOF;
         $detector = new CollisionDetector(
             new DetectionConfig(
                 [__DIR__ . '/data/parse-error/code.php'],
+                [],
                 ['.php'],
                 __DIR__
             )
@@ -76,14 +77,16 @@ EOF;
 
     /**
      * @param list<string> $paths
+     * @param list<string> $excludedPaths
      * @param array<string, list<string>> $expectedResults
      * @dataProvider provideCases
      */
-    public function testCollisionDetection(array $paths, array $expectedResults): void
+    public function testCollisionDetection(array $paths, array $excludedPaths, array $expectedResults): void
     {
         $detector = new CollisionDetector(
             new DetectionConfig(
                 $paths,
+                $excludedPaths,
                 ['.php'],
                 __DIR__
             )
@@ -135,16 +138,19 @@ EOF;
     {
         yield [
             'paths' => [__DIR__ . '/data/allowed-duplicates'],
+            'excludedPaths' => [],
             'expectedResults' => [],
         ];
 
         yield [
             'paths' => [__DIR__ . '/data/use-statement'], // basically tests that isWithinUseStatement is working properly
+            'excludedPaths' => [],
             'expectedResults' => [],
         ];
 
         yield [
             'paths' => [__DIR__ . '/data/basic-cases/simple.php'],
+            'excludedPaths' => [],
             'expectedResults' => [
                 'DuplicateClass' => [
                     new FileLine('/data/basic-cases/simple.php', 3),
@@ -163,6 +169,7 @@ EOF;
 
         yield [
             'paths' => [__DIR__ . '/data/basic-cases/html.php'],
+            'excludedPaths' => [],
             'expectedResults' => [
                 'Bar' => [
                     new FileLine('/data/basic-cases/html.php', 3),
@@ -173,6 +180,7 @@ EOF;
 
         yield [
             'paths' => [__DIR__ . '/data/fatal-error/code.php'],
+            'excludedPaths' => [],
             'expectedResults' => [
                 'Exists' => [
                     new FileLine('/data/fatal-error/code.php', 6),
@@ -183,6 +191,7 @@ EOF;
 
         yield [
             'paths' => [__DIR__ . '/data/basic-cases/groups.php'],
+            'excludedPaths' => [],
             'expectedResults' => [
                 'Go' => [
                     new FileLine('/data/basic-cases/groups.php', 3),
@@ -195,6 +204,7 @@ EOF;
         if (PHP_VERSION_ID >= 80100) {
             yield [
                 'paths' => [__DIR__ . '/data/basic-cases/groups-with-enum.php'],
+                'excludedPaths' => [],
                 'expectedResults' => [
                     'Go' => [
                         new FileLine('/data/basic-cases/groups-with-enum.php', 3),
@@ -208,6 +218,7 @@ EOF;
 
         yield [
             'paths' => [__DIR__ . '/data/basic-cases/multiple-namespaces.php'],
+            'excludedPaths' => [],
             'expectedResults' => [
                 'Foo\X' => [
                     new FileLine('/data/basic-cases/multiple-namespaces.php', 5),
@@ -218,6 +229,7 @@ EOF;
 
         yield [
             'paths' => [__DIR__ . '/data/basic-cases/multiple-namespaces-braced.php'],
+            'excludedPaths' => [],
             'expectedResults' => [
                 'Foo\X' => [
                     new FileLine('/data/basic-cases/multiple-namespaces-braced.php', 4),
@@ -228,6 +240,7 @@ EOF;
 
         yield [
             'paths' => [__DIR__ . '/data/multiple-files'],
+            'excludedPaths' => [],
             'expectedResults' => [
                 'Foo\NamespacedClass' => [
                     new FileLine('/data/multiple-files/colliding1.php', 11),
@@ -248,6 +261,25 @@ EOF;
                 'Foo\NAMESPACED_CONST' => [
                     new FileLine('/data/multiple-files/colliding1.php', 13),
                     new FileLine('/data/multiple-files/colliding3.php', 7),
+                ],
+                'GLOBAL_CONST' => [
+                    new FileLine('/data/multiple-files/colliding1.php', 6),
+                    new FileLine('/data/multiple-files/colliding2.php', 6),
+                ],
+            ],
+        ];
+
+        yield [
+            'paths' => [__DIR__ . '/data/multiple-files'],
+            'excludedPaths' => [__DIR__ . '/data/multiple-files/colliding3.php'],
+            'expectedResults' => [
+                'GlobalClass' => [
+                    new FileLine('/data/multiple-files/colliding1.php', 4),
+                    new FileLine('/data/multiple-files/colliding2.php', 4),
+                ],
+                'globalFunction' => [
+                    new FileLine('/data/multiple-files/colliding1.php', 5),
+                    new FileLine('/data/multiple-files/colliding2.php', 5),
                 ],
                 'GLOBAL_CONST' => [
                     new FileLine('/data/multiple-files/colliding1.php', 6),

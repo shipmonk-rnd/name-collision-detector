@@ -19,6 +19,7 @@ use function preg_quote;
 use function preg_replace;
 use function str_replace;
 use function strlen;
+use function strpos;
 use function substr;
 use function token_get_all;
 use function token_name;
@@ -72,8 +73,12 @@ class CollisionDetector
         ];
         $types = [];
 
-        foreach ($this->config->getScanPaths() as $directory) {
-            foreach ($this->listPhpFilesIn($directory) as $filePath) {
+        foreach ($this->config->getScanPaths() as $scanPath) {
+            foreach ($this->listPhpFilesIn($scanPath) as $filePath) {
+                if ($this->isExcluded($filePath)) {
+                    continue;
+                }
+
                 try {
                     foreach ($this->getTypesInFile($filePath) as $group => $classes) {
                         foreach ($classes as [$line, $class]) {
@@ -300,6 +305,17 @@ class CollisionDetector
             default:
                 throw new LogicException("Unexpected token #$tokenId: " . token_name($tokenId));
         }
+    }
+
+    private function isExcluded(string $filePath): bool
+    {
+        foreach ($this->config->getExcludePaths() as $excludePath) {
+            if (strpos($filePath, $excludePath) !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

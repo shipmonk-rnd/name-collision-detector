@@ -34,6 +34,11 @@ class DetectionConfig
     /**
      * @var list<string>
      */
+    private $excludePaths;
+
+    /**
+     * @var list<string>
+     */
     private $fileExtensions;
 
     /**
@@ -48,10 +53,13 @@ class DetectionConfig
 
     /**
      * @param list<string> $scanPaths Absolute paths
+     * @param list<string> $excludePaths Absolute paths
      * @param list<string> $fileExtensions
+     * @internal only for tests
      */
     public function __construct(
         array $scanPaths,
+        array $excludePaths,
         array $fileExtensions,
         string $currentDirectory,
         bool $ignoreParseFailures = false
@@ -63,7 +71,14 @@ class DetectionConfig
             }
         }
 
+        foreach ($excludePaths as $excludePath) {
+            if (!is_dir($excludePath) && !is_file($excludePath)) {
+                throw new LogicException("Expected absolute path of existing file or dir, '$excludePath' found.");
+            }
+        }
+
         $this->scanPaths = $scanPaths;
+        $this->excludePaths = $excludePaths;
         $this->currentDirectory = $currentDirectory;
         $this->ignoreParseFailures = $ignoreParseFailures;
         $this->fileExtensions = $fileExtensions;
@@ -153,13 +168,15 @@ class DetectionConfig
         try {
             $processor = new SchemaProcessor();
 
-            /** @var array{scanPaths: list<string>, fileExtensions: list<string>, ignoreParseFailures: bool} $normalizedConfig */
+            /** @var array{scanPaths: list<string>, excludePaths: list<string>, fileExtensions: list<string>, ignoreParseFailures: bool} $normalizedConfig */
             $normalizedConfig = $processor->process(self::getConfigSchema(), $configData);
         } catch (ValidationException $e) {
             throw new InvalidConfigException($e->getMessage(), $e);
         }
 
         $absoluteScanPaths = [];
+        $absoluteExcludePaths = [];
+
         $sourcePaths = $providedDirectories === []
             ? $normalizedConfig['scanPaths']
             : $providedDirectories;
@@ -171,8 +188,13 @@ class DetectionConfig
             $absoluteScanPaths[] = self::joinPath($pathDirectory, $paths);
         }
 
+        foreach ($normalizedConfig['excludePaths'] as $paths) {
+            $absoluteExcludePaths[] = self::joinPath($configFileDirectory, $paths);
+        }
+
         return new self(
             $absoluteScanPaths,
+            $absoluteExcludePaths,
             $normalizedConfig['fileExtensions'],
             $currentDirectory,
             $normalizedConfig['ignoreParseFailures']
@@ -185,6 +207,14 @@ class DetectionConfig
     public function getScanPaths(): array
     {
         return $this->scanPaths;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getExcludePaths(): array
+    {
+        return $this->excludePaths;
     }
 
     public function getCurrentDirectory(): string
@@ -210,6 +240,7 @@ class DetectionConfig
         return Expect::structure([
             'ignoreParseFailures' => Expect::bool()->default(false),
             'scanPaths' => Expect::listOf(Expect::string())->mergeDefaults(false)->default([]),
+            'excludePaths' => Expect::listOf(Expect::string())->mergeDefaults(false)->default([]),
             'fileExtensions' => Expect::listOf(Expect::string())->mergeDefaults(false)->default(['.php']),
         ])->castTo('array');
     }
