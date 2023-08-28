@@ -17,7 +17,6 @@ use function is_file;
 use function ksort;
 use function preg_quote;
 use function preg_replace;
-use function str_replace;
 use function strlen;
 use function strpos;
 use function substr;
@@ -82,7 +81,7 @@ class CollisionDetector
                 try {
                     foreach ($this->getTypesInFile($filePath) as $group => $classes) {
                         foreach ($classes as [$line, $class]) {
-                            $types[$group][$class][] = new FileLine($this->normalizePath($filePath), $line);
+                            $types[$group][$class][] = new FileLine($this->stripCwdFromPath($filePath), $line);
                         }
                     }
                 } catch (FileParsingException $e) {
@@ -121,7 +120,7 @@ class CollisionDetector
         return $collidingTypes;
     }
 
-    private function normalizePath(string $path): string
+    private function stripCwdFromPath(string $path): string
     {
         $cwdForRegEx = preg_quote($this->config->getCurrentDirectory(), '~');
         $replacedFileName = preg_replace("~^{$cwdForRegEx}~", '', $path);
@@ -130,7 +129,7 @@ class CollisionDetector
             throw new LogicException('Invalid regex, should not happen');
         }
 
-        return str_replace('\\', '/', $replacedFileName);
+        return $replacedFileName;
     }
 
     /**
