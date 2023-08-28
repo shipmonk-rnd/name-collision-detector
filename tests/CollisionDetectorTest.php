@@ -136,19 +136,19 @@ EOF;
      */
     public function provideCases(): iterable
     {
-        yield [
+        yield 'allowed duplicates' => [
             'paths' => [__DIR__ . '/data/allowed-duplicates'],
             'excludedPaths' => [],
             'expectedResults' => [],
         ];
 
-        yield [
+        yield 'use statements' => [
             'paths' => [__DIR__ . '/data/use-statement'], // basically tests that isWithinUseStatement is working properly
             'excludedPaths' => [],
             'expectedResults' => [],
         ];
 
-        yield [
+        yield 'simple cases' => [
             'paths' => [__DIR__ . '/data/basic-cases/simple.php'],
             'excludedPaths' => [],
             'expectedResults' => [
@@ -167,7 +167,7 @@ EOF;
             ],
         ];
 
-        yield [
+        yield 'html case' => [
             'paths' => [__DIR__ . '/data/basic-cases/html.php'],
             'excludedPaths' => [],
             'expectedResults' => [
@@ -178,7 +178,7 @@ EOF;
             ],
         ];
 
-        yield [
+        yield 'fatal error' => [
             'paths' => [__DIR__ . '/data/fatal-error/code.php'],
             'excludedPaths' => [],
             'expectedResults' => [
@@ -189,7 +189,7 @@ EOF;
             ],
         ];
 
-        yield [
+        yield 'groups' => [
             'paths' => [__DIR__ . '/data/basic-cases/groups.php'],
             'excludedPaths' => [],
             'expectedResults' => [
@@ -202,7 +202,7 @@ EOF;
         ];
 
         if (PHP_VERSION_ID >= 80100) {
-            yield [
+            yield 'groups with enum' => [
                 'paths' => [__DIR__ . '/data/basic-cases/groups-with-enum.php'],
                 'excludedPaths' => [],
                 'expectedResults' => [
@@ -216,7 +216,7 @@ EOF;
             ];
         }
 
-        yield [
+        yield 'multi namespace' => [
             'paths' => [__DIR__ . '/data/basic-cases/multiple-namespaces.php'],
             'excludedPaths' => [],
             'expectedResults' => [
@@ -227,7 +227,7 @@ EOF;
             ],
         ];
 
-        yield [
+        yield 'multi namespace braced' => [
             'paths' => [__DIR__ . '/data/basic-cases/multiple-namespaces-braced.php'],
             'excludedPaths' => [],
             'expectedResults' => [
@@ -238,7 +238,7 @@ EOF;
             ],
         ];
 
-        yield [
+        yield 'more files' => [
             'paths' => [__DIR__ . '/data/multiple-files'],
             'excludedPaths' => [],
             'expectedResults' => [
@@ -269,7 +269,7 @@ EOF;
             ],
         ];
 
-        yield [
+        yield 'more files with exclude' => [
             'paths' => [__DIR__ . '/data/multiple-files'],
             'excludedPaths' => [__DIR__ . '/data/multiple-files/colliding3.php'],
             'expectedResults' => [

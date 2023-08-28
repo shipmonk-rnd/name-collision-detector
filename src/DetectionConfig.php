@@ -9,6 +9,7 @@ use Nette\Schema\Expect;
 use Nette\Schema\Processor as SchemaProcessor;
 use Nette\Schema\ValidationException;
 use ShipMonk\NameCollision\Exception\InvalidConfigException;
+use function array_map;
 use function dirname;
 use function extension_loaded;
 use function file_get_contents;
@@ -65,20 +66,22 @@ class DetectionConfig
         bool $ignoreParseFailures = false
     )
     {
-        foreach ($scanPaths as $scanPath) {
-            if (!is_dir($scanPath) && !is_file($scanPath)) {
-                throw new LogicException("Expected absolute path of existing file or dir, '$scanPath' found.");
+        $normalizePath = static function (string $path): string {
+            if (!is_dir($path) && !is_file($path)) {
+                throw new LogicException("Expected absolute path of existing file or dir, '$path' found.");
             }
-        }
 
-        foreach ($excludePaths as $excludePath) {
-            if (!is_dir($excludePath) && !is_file($excludePath)) {
-                throw new LogicException("Expected absolute path of existing file or dir, '$excludePath' found.");
+            $absoluteRealPath = realpath($path);
+
+            if ($absoluteRealPath === false) {
+                throw new LogicException("Unable to realpath \"$path\" even though it is existing file or dir");
             }
-        }
 
-        $this->scanPaths = $scanPaths;
-        $this->excludePaths = $excludePaths;
+            return $absoluteRealPath;
+        };
+
+        $this->scanPaths = array_map($normalizePath, $scanPaths);
+        $this->excludePaths = array_map($normalizePath, $excludePaths);
         $this->currentDirectory = $currentDirectory;
         $this->ignoreParseFailures = $ignoreParseFailures;
         $this->fileExtensions = $fileExtensions;
@@ -144,13 +147,7 @@ class DetectionConfig
             throw new InvalidConfigException("Provided directory to scan \"$absolutePath\" is not directory nor a file");
         }
 
-        $absoluteRealPath = realpath($absolutePath);
-
-        if ($absoluteRealPath === false) {
-            throw new LogicException("Unable to realpath \"$absolutePath\" even though it is existing file or dir");
-        }
-
-        return $absoluteRealPath;
+        return $absolutePath;
     }
 
     /**
