@@ -374,6 +374,7 @@
 
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint">
         <properties>
+            <property name="enableMixedTypeHint" value="false"/>
             <property name="traversableTypeHints" type="array" value="
                 Generator,
                 Traversable

@@ -1,0 +1,10 @@
+{
+    "ignoreParseFailures": true,
+    "scanPaths": [
+        "."
+    ],
+    "excludePaths": [
+        "valid.json"
+    ],
+    "fileExtensions": [".php8"]
+}

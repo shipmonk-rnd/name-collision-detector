@@ -9,19 +9,20 @@ use ParseError;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ShipMonk\NameCollision\Exception\FileParsingException;
-use ShipMonk\NameCollision\Exception\InvalidPathProvidedException;
 use function count;
 use function file_get_contents;
 use function in_array;
 use function is_array;
-use function is_dir;
+use function is_file;
 use function ksort;
 use function preg_quote;
 use function preg_replace;
-use function sort;
+use function strlen;
+use function strpos;
 use function substr;
 use function token_get_all;
 use function token_name;
+use function usort;
 use const PHP_VERSION_ID;
 use const T_CLASS;
 use const T_COMMENT;
@@ -49,34 +50,18 @@ class CollisionDetector
     const TYPE_GROUP_CONSTANT = 'const';
 
     /**
-     * @var list<string>
+     * @var DetectionConfig
      */
-    private $directories;
+    private $config;
 
-    /**
-     * @var string|null
-     */
-    private $cwd;
-
-    /**
-     * @param list<string> $directories
-     * @param string|null $cwd Path prefix to strip
-     * @throws InvalidPathProvidedException
-     */
-    public function __construct(array $directories, ?string $cwd = null)
+    public function __construct(DetectionConfig $config)
     {
-        foreach ($directories as $directory) {
-            if (!is_dir($directory)) {
-                throw new InvalidPathProvidedException("Path \"$directory\" is not directory");
-            }
-        }
-
-        $this->directories = $directories;
-        $this->cwd = $cwd;
+        $this->config = $config;
     }
 
     /**
-     * @return array<string, list<string>>
+     * @return array<string, list<FileLine>>
+     * @throws FileParsingException
      */
     public function getCollidingTypes(): array
     {
@@ -87,16 +72,24 @@ class CollisionDetector
         ];
         $types = [];
 
-        foreach ($this->directories as $directory) {
-            foreach ($this->listPhpFilesIn($directory) as $filePath) {
+        foreach ($this->config->getScanPaths() as $scanPath) {
+            foreach ($this->listPhpFilesIn($scanPath) as $filePath) {
+                if ($this->isExcluded($filePath)) {
+                    continue;
+                }
+
                 try {
                     foreach ($this->getTypesInFile($filePath) as $group => $classes) {
-                        foreach ($classes as $class) {
-                            $types[$group][$class][] = $this->normalizePath($filePath);
+                        foreach ($classes as ['line' => $line, 'name' => $class]) {
+                            $types[$group][$class][] = new FileLine($this->stripCwdFromPath($filePath), $line);
                         }
                     }
                 } catch (FileParsingException $e) {
-                    continue;
+                    if ($this->config->shouldIgnoreParseFailures()) {
+                        continue;
+                    }
+
+                    throw $e;
                 }
             }
         }
@@ -107,10 +100,19 @@ class CollisionDetector
             $classToFilesMap = $types[$group] ?? [];
             ksort($classToFilesMap);
 
-            foreach ($classToFilesMap as $className => $fileNames) {
-                if (count($fileNames) > 1) {
-                    sort($fileNames);
-                    $collidingTypes[$className] = $fileNames;
+            foreach ($classToFilesMap as $className => $fileLines) {
+                if (count($fileLines) > 1) {
+                    usort($fileLines, static function (FileLine $a, FileLine $b): int {
+                        $pathDiff = $a->getFilePath() <=> $b->getFilePath();
+
+                        if ($pathDiff === 0) {
+                            return $a->getLine() <=> $b->getLine();
+                        }
+
+                        return $pathDiff;
+                    });
+
+                    $collidingTypes[$className] = $fileLines;
                 }
             }
         }
@@ -118,20 +120,16 @@ class CollisionDetector
         return $collidingTypes;
     }
 
-    private function normalizePath(string $path): string
+    private function stripCwdFromPath(string $path): string
     {
-        if ($this->cwd !== null) {
-            $cwdForRegEx = preg_quote($this->cwd, '~');
-            $replacedFileName = preg_replace("~^{$cwdForRegEx}~", '', $path);
+        $cwdForRegEx = preg_quote($this->config->getCurrentDirectory(), '~');
+        $replacedFileName = preg_replace("~^{$cwdForRegEx}~", '', $path);
 
-            if ($replacedFileName === null) {
-                throw new LogicException('Invalid regex, should not happen');
-            }
-
-            return $replacedFileName;
+        if ($replacedFileName === null) {
+            throw new LogicException('Invalid regex, should not happen');
         }
 
-        return $path;
+        return $replacedFileName;
     }
 
     /**
@@ -139,7 +137,7 @@ class CollisionDetector
      * Based on Nette\Loaders\RobotLoader::scanPhp
      *
      * @license https://github.com/nette/robot-loader/blob/v3.4.0/license.md
-     * @return array<self::TYPE_GROUP_*, list<string>>
+     * @return array<self::TYPE_GROUP_*, list<array{line: int, name: string}>>
      * @throws FileParsingException
      */
     private function getTypesInFile(string $file): array
@@ -150,6 +148,7 @@ class CollisionDetector
             throw new FileParsingException("Unable to get contents of $file");
         }
 
+        $line = -1;
         $expected = null;
         $namespace = $name = '';
         $level = $minLevel = 0;
@@ -193,6 +192,7 @@ class CollisionDetector
                         }
 
                         $expected = $token[0];
+                        $line = $token[2];
                         $name = '';
                         continue 2;
 
@@ -208,7 +208,7 @@ class CollisionDetector
                     $minLevel = $token === '{' ? 1 : 0;
 
                 } elseif ($name !== '' && $level === $minLevel) {
-                    $types[$this->detectGroupType($expected)][] = $namespace . $name;
+                    $types[$this->detectGroupType($expected)][] = ['line' => $line, 'name' => $namespace . $name];
                 }
 
                 $expected = null;
@@ -227,18 +227,34 @@ class CollisionDetector
     /**
      * @return Generator<string>
      */
-    private function listPhpFilesIn(string $directory): Generator
+    private function listPhpFilesIn(string $path): Generator
     {
-        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
+        if (is_file($path) && $this->isExtensionToCheck($path)) {
+            yield $path;
+            return;
+        }
+
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
 
         foreach ($iterator as $entry) {
             /** @var DirectoryIterator $entry */
-            if (!$entry->isFile() || !$entry->isReadable() || substr($entry->getFilename(), -4) !== '.php') {
+            if (!$entry->isFile() || !$this->isExtensionToCheck($entry->getFilename())) {
                 continue;
             }
 
             yield $entry->getPathname();
         }
+    }
+
+    private function isExtensionToCheck(string $filePath): bool
+    {
+        foreach ($this->config->getFileExtensions() as $extension) {
+            if (substr($filePath, -(strlen($extension) + 1)) === ".$extension") {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -288,6 +304,17 @@ class CollisionDetector
             default:
                 throw new LogicException("Unexpected token #$tokenId: " . token_name($tokenId));
         }
+    }
+
+    private function isExcluded(string $filePath): bool
+    {
+        foreach ($this->config->getExcludePaths() as $excludePath) {
+            if (strpos($filePath, $excludePath) !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
