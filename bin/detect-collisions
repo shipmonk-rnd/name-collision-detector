@@ -32,9 +32,12 @@ $directories = array_slice($argv, 1);
 $configFilePath = $cwd . "/collision-detector.json";
 
 try {
-    $config = file_exists($configFilePath)
-        ? DetectionConfig::fromConfigFile($directories, $cwd, $configFilePath)
-        : DetectionConfig::fromDefaults($directories, $cwd);
+    if (file_exists($configFilePath)) {
+        echo "Using config '$configFilePath'" . PHP_EOL;
+        $config = DetectionConfig::fromConfigFile($directories, $cwd, $configFilePath);
+    } else {
+        $config = DetectionConfig::fromDefaults($directories, $cwd);
+    }
 
     if ($config->getScanPaths() === []) {
         $exit("No directories provided, use e.g. `detect-collisions src tests` or setup scanPaths in collision-detector.json");

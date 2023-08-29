@@ -82,7 +82,7 @@ class DetectionConfig
 
         $this->scanPaths = array_map($normalizePath, $scanPaths);
         $this->excludePaths = array_map($normalizePath, $excludePaths);
-        $this->currentDirectory = $currentDirectory;
+        $this->currentDirectory = $normalizePath($currentDirectory);
         $this->ignoreParseFailures = $ignoreParseFailures;
         $this->fileExtensions = $fileExtensions;
     }
@@ -112,8 +112,10 @@ class DetectionConfig
         }
 
         try {
+            $jsonThrowOnError = 4194304; // value of JSON_THROW_ON_ERROR (const unavailable till PHP 7.3)
+
             /** @throws JsonException */
-            $configArray = json_decode($configData, true, JSON_PRESERVE_ZERO_FRACTION | 4194304); // throw on error if available
+            $configArray = json_decode($configData, true, JSON_PRESERVE_ZERO_FRACTION | $jsonThrowOnError);
         } catch (JsonException $e) {
             throw new InvalidConfigException("Failure while parsing JSON in $configFilePath: {$e->getMessage()}", $e);
         }
