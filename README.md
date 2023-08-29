@@ -31,8 +31,8 @@ GlobalInterface1 is defined 2 times:
 If file named `collision-detector.json` is present within current working directory, its contents are taken as configuration options. Possible config options:
 ```json5
 {
-    "scanPaths": ["src", "tests"], // files/directories to scan, relative to config file directory
-    "excludePaths": ["tests/collisions"], // files/directories to exclude, relative to config file directory
+    "scanPaths": ["src", "tests"], // files/directories to scan, relative to config file directory, glob not supported
+    "excludePaths": ["tests/collisions"], // files/directories to exclude, relative to config file directory, glob not supported
     "fileExtensions": ["php"], // file extensions to parse
     "ignoreParseFailures": false // skip files with parse errors or not
 }
