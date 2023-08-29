@@ -238,7 +238,7 @@ class DetectionConfig
             'ignoreParseFailures' => Expect::bool()->default(false),
             'scanPaths' => Expect::listOf(Expect::string())->mergeDefaults(false)->default([]),
             'excludePaths' => Expect::listOf(Expect::string())->mergeDefaults(false)->default([]),
-            'fileExtensions' => Expect::listOf(Expect::string())->mergeDefaults(false)->default(['.php']),
+            'fileExtensions' => Expect::listOf(Expect::string())->mergeDefaults(false)->default(['php']),
         ])->castTo('array');
     }
 

@@ -67,7 +67,7 @@ EOF;
             new DetectionConfig(
                 [__DIR__ . '/data/parse-error/code.php'],
                 [],
-                ['.php'],
+                ['php'],
                 __DIR__
             )
         );
@@ -87,7 +87,7 @@ EOF;
             new DetectionConfig(
                 $paths,
                 $excludedPaths,
-                ['.php'],
+                ['php'],
                 __DIR__
             )
         );

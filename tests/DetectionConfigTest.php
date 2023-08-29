@@ -60,7 +60,7 @@ class DetectionConfigTest extends TestCase
             'configPath' => __DIR__ . '/data/config-files/empty.json',
             'resultingScanPaths' => [],
             'resultingExcludePaths' => [],
-            'resultingFileExtensions' => ['.php'],
+            'resultingFileExtensions' => ['php'],
             'resultingIgnoreParseFailure' => false,
             'error' => null,
         ];
@@ -126,7 +126,7 @@ class DetectionConfigTest extends TestCase
             'configPath' => __DIR__ . '/data/config-files/empty.json',
             'resultingScanPaths' => [realpath(__DIR__ . '/.')],
             'resultingExcludePaths' => [],
-            'resultingFileExtensions' => ['.php'],
+            'resultingFileExtensions' => ['php'],
             'resultingIgnoreParseFailure' => false,
             'error' => null,
         ];

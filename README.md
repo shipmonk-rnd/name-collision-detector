@@ -33,7 +33,7 @@ If file named `collision-detector.json` is present within current working direct
 {
     "scanPaths": ["src", "tests"], // files/directories to scan, relative to config file directory
     "excludePaths": ["tests/collisions"], // files/directories to exclude, relative to config file directory
-    "fileExtensions": [".php"], // file extensions to parse
+    "fileExtensions": ["php"], // file extensions to parse
     "ignoreParseFailures": false // skip files with parse errors or not
 }
 ```

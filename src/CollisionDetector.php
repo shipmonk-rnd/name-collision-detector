@@ -249,7 +249,7 @@ class CollisionDetector
     private function isExtensionToCheck(string $filePath): bool
     {
         foreach ($this->config->getFileExtensions() as $extension) {
-            if (substr($filePath, -strlen($extension)) === $extension) {
+            if (substr($filePath, -(strlen($extension) + 1)) === ".$extension") {
                 return true;
             }
         }
