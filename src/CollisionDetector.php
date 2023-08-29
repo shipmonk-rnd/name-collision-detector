@@ -80,7 +80,7 @@ class CollisionDetector
 
                 try {
                     foreach ($this->getTypesInFile($filePath) as $group => $classes) {
-                        foreach ($classes as [$line, $class]) {
+                        foreach ($classes as ['line' => $line, 'name' => $class]) {
                             $types[$group][$class][] = new FileLine($this->stripCwdFromPath($filePath), $line);
                         }
                     }
@@ -137,7 +137,7 @@ class CollisionDetector
      * Based on Nette\Loaders\RobotLoader::scanPhp
      *
      * @license https://github.com/nette/robot-loader/blob/v3.4.0/license.md
-     * @return array<self::TYPE_GROUP_*, list<array{int, string}>>
+     * @return array<self::TYPE_GROUP_*, list<array{line: int, name: string}>>
      * @throws FileParsingException
      */
     private function getTypesInFile(string $file): array
@@ -208,7 +208,7 @@ class CollisionDetector
                     $minLevel = $token === '{' ? 1 : 0;
 
                 } elseif ($name !== '' && $level === $minLevel) {
-                    $types[$this->detectGroupType($expected)][] = [$line, $namespace . $name];
+                    $types[$this->detectGroupType($expected)][] = ['line' => $line, 'name' => $namespace . $name];
                 }
 
                 $expected = null;
