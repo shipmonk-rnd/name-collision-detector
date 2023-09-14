@@ -9,6 +9,7 @@ use function preg_match;
 use function proc_close;
 use function proc_open;
 use function stream_get_contents;
+use const PHP_EOL;
 use const PHP_VERSION_ID;
 
 class CollisionDetectorTest extends TestCase
@@ -18,7 +19,7 @@ class CollisionDetectorTest extends TestCase
     {
         $expectedNoDirectoryRegex = '~^ERROR: No directories provided, use e.g. `detect-collisions src tests` or setup scanPaths in~';
         $expectedInvalidDirectoryRegex = '~^ERROR: Provided directory to scan ".*?nonsense" is not directory nor a file~';
-        $expectedSuccessWithConfigRegex = '~^Using config .*?\n\nOK: no name collision found~';
+        $expectedSuccessWithConfigRegex = '~^Using config .*?' . PHP_EOL . PHP_EOL . 'OK: no name collision found~';
         $expectedSuccessRegex = '~^OK: no name collision found~';
 
         $space = ' '; // bypass editorconfig checker
