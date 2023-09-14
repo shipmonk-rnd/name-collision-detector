@@ -17,9 +17,10 @@ class CollisionDetectorTest extends TestCase
 
     public function testBinScript(): void
     {
-        $expectedNoDirectory = 'ERROR: No directories provided, use e.g. `detect-collisions src tests` or setup scanPaths in collision-detector.json' . PHP_EOL;
-        $expectedInvalidDirectoryRegex = '~^ERROR: Provided directory to scan ".*?nonsense" is not directory nor a file' . PHP_EOL . '$~';
-        $expectedSuccessRegex = '~OK: no name collision found~';
+        $expectedNoDirectoryRegex = '~^ERROR: No directories provided, use e.g. `detect-collisions src tests` or setup scanPaths in~';
+        $expectedInvalidDirectoryRegex = '~^ERROR: Provided directory to scan ".*?nonsense" is not directory nor a file~';
+        $expectedSuccessWithConfigRegex = '~^Using config .*?' . PHP_EOL . PHP_EOL . 'OK: no name collision found~';
+        $expectedSuccessRegex = '~^OK: no name collision found~';
 
         $space = ' '; // bypass editorconfig checker
         $expectedClasses = <<<EOF
@@ -48,17 +49,20 @@ $space> /data/multiple-files/colliding1.php:6
 $space> /data/multiple-files/colliding2.php:6
 
 
+
 EOF;
 
         $successOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions ../src', 0);
+        $successOutputWithCustomConfig = $this->runCommand(__DIR__ . '/../bin/detect-collisions --configuration data/config-files/valid.json ../src', 0);
         $regularOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions data/multiple-files', 1);
         $invalidDirectoryOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions nonsense', 255);
         $noDirectoryOutput = $this->runCommand(__DIR__ . '/../bin/detect-collisions', 255);
 
         self::assertSame($expectedClasses, $regularOutput);
-        self::assertSame($expectedNoDirectory, $noDirectoryOutput);
-        self::assertSame(1, preg_match($expectedSuccessRegex, $successOutput));
-        self::assertSame(1, preg_match($expectedInvalidDirectoryRegex, $invalidDirectoryOutput));
+        self::assertSame(1, preg_match($expectedNoDirectoryRegex, $noDirectoryOutput), 'Real output: ' . $noDirectoryOutput);
+        self::assertSame(1, preg_match($expectedSuccessRegex, $successOutput), 'Real output: ' . $successOutput);
+        self::assertSame(1, preg_match($expectedSuccessWithConfigRegex, $successOutputWithCustomConfig), 'Real output: ' . $successOutputWithCustomConfig);
+        self::assertSame(1, preg_match($expectedInvalidDirectoryRegex, $invalidDirectoryOutput), 'Real output: ' . $invalidDirectoryOutput);
     }
 
     public function testParseError(): void

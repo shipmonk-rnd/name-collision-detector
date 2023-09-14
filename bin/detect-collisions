@@ -22,25 +22,48 @@ foreach ($autoloadFiles as $autoloadFile) {
  * @return never
  */
 $exit = function (string $message): void {
-    echo "ERROR: $message" . PHP_EOL;
+    echo "ERROR: $message" . PHP_EOL . PHP_EOL;
     exit(255);
 };
 
-$cwd = getcwd();
-$directories = array_slice($argv, 1);
+$providedOptions = getopt('', ['help', 'configuration:'], $restIndex);
 
-$configFilePath = $cwd . "/collision-detector.json";
+$cwd = getcwd();
+$directories = array_slice($argv, $restIndex);
+
+if (isset($providedOptions['help'])) {
+    echo <<<EOD
+
+Usage:
+    vendor/bin/detect-collisions dir-to-scan
+
+Options:
+    --help                      Print this help text and exit.
+    --configuration <path>      Provide custom json configuration file
+
+EOD;
+    exit;
+}
+
+if (isset($providedOptions['configuration'])) {
+    $configFilePath = $cwd . "/" . $providedOptions['configuration'];
+    if (!is_file($configFilePath)) {
+        $exit("Invalid config path given, $configFilePath is not a file.");
+    }
+} else {
+    $configFilePath = $cwd . "/collision-detector.json";
+}
 
 try {
     if (file_exists($configFilePath)) {
-        echo "Using config '$configFilePath'" . PHP_EOL;
+        echo "Using config '$configFilePath'" . PHP_EOL . PHP_EOL;
         $config = DetectionConfig::fromConfigFile($directories, $cwd, $configFilePath);
     } else {
         $config = DetectionConfig::fromDefaults($directories, $cwd);
     }
 
     if ($config->getScanPaths() === []) {
-        $exit("No directories provided, use e.g. `detect-collisions src tests` or setup scanPaths in collision-detector.json");
+        $exit("No directories provided, use e.g. `detect-collisions src tests` or setup scanPaths in $configFilePath");
     }
 
     $detector = new CollisionDetector($config);
@@ -61,5 +84,7 @@ foreach ($collisions as $name => $fileLines) {
 if ($collisions === []) {
     echo "OK: no name collision found". PHP_EOL;
 }
+
+echo PHP_EOL;
 
 exit(count($collisions) > 0 ? 1 : 0);

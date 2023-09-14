@@ -170,7 +170,7 @@ class DetectionConfig
             /** @var array{scanPaths: list<string>, excludePaths: list<string>, fileExtensions: list<string>, ignoreParseFailures: bool} $normalizedConfig */
             $normalizedConfig = $processor->process(self::getConfigSchema(), $configData);
         } catch (ValidationException $e) {
-            throw new InvalidConfigException($e->getMessage(), $e);
+            throw new InvalidConfigException('Parsing json config failed with: ' . $e->getMessage(), $e);
         }
 
         $absoluteScanPaths = [];
