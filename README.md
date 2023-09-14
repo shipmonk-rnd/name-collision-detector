@@ -39,6 +39,8 @@ If file named `collision-detector.json` is present within current working direct
 ```
 Paths provided by CLI arguments have priority over those in `scanDirs`.
 
+You can provide custom path to config file by `vendor/bin/detect-collisions --configuration path/to/config.json`
+
 ## Reasoning
 Having colliding classes within project can cause crazy headaches while debugging why something works only sometimes.
 Typically, you have PSR-4 autoloading solving this problem for you, but there are cases (like [PHPStan rules test files](https://github.com/shipmonk-rnd/phpstan-rules/tree/master/tests/Rule/data)) where you want to write any code (with [classmap](https://getcomposer.org/doc/04-schema.md#classmap) autoloading).
