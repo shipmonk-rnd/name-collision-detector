@@ -48,5 +48,5 @@ And in such cases, the test may work when executed in standalone run, but fail w
 Therefore, having a collision detector in CI might be useful.
 
 ## Supported PHP versions
-- PHP 7.2 - PHP 8.2
+- PHP 7.2 - PHP 8.3
 
