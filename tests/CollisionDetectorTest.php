@@ -301,7 +301,7 @@ EOF;
         yield 'more files with exclude' => [
             'paths' => [__DIR__ . '/data/multiple-files'],
             'excludedPaths' => [__DIR__ . '/data/multiple-files/colliding3.php'],
-            'expectedAnalysedFiles' => 5,
+            'expectedAnalysedFiles' => 4,
             'expectedExcludedFiles' => 1,
             'expectedResults' => [
                 'GlobalClass' => [

@@ -70,13 +70,11 @@ class CollisionDetector
             self::TYPE_GROUP_CONSTANT,
         ];
         $types = [];
-        $filesScanned = 0;
+        $filesAnalysed = 0;
         $filesExcluded = 0;
 
         foreach ($this->config->getScanPaths() as $scanPath) {
             foreach ($this->listPhpFilesIn($scanPath) as $filePath) {
-                $filesScanned++;
-
                 if ($this->isExcluded($filePath)) {
                     $filesExcluded++;
                     continue;
@@ -96,6 +94,8 @@ class CollisionDetector
 
                     throw $e;
                 }
+
+                $filesAnalysed++;
             }
         }
 
@@ -123,7 +123,7 @@ class CollisionDetector
         }
 
         return new DetectionResult(
-            $filesScanned,
+            $filesAnalysed,
             $filesExcluded,
             $collidingTypes
         );
