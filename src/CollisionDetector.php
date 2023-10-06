@@ -60,10 +60,9 @@ class CollisionDetector
     }
 
     /**
-     * @return array<string, list<FileLine>>
      * @throws FileParsingException
      */
-    public function getCollidingTypes(): array
+    public function getCollidingTypes(): DetectionResult
     {
         $groups = [
             self::TYPE_GROUP_CLASS,
@@ -71,10 +70,15 @@ class CollisionDetector
             self::TYPE_GROUP_CONSTANT,
         ];
         $types = [];
+        $filesScanned = 0;
+        $filesExcluded = 0;
 
         foreach ($this->config->getScanPaths() as $scanPath) {
             foreach ($this->listPhpFilesIn($scanPath) as $filePath) {
+                $filesScanned++;
+
                 if ($this->isExcluded($filePath)) {
+                    $filesExcluded++;
                     continue;
                 }
 
@@ -86,6 +90,7 @@ class CollisionDetector
                     }
                 } catch (FileParsingException $e) {
                     if ($this->config->shouldIgnoreParseFailures()) {
+                        $filesExcluded++;
                         continue;
                     }
 
@@ -117,7 +122,11 @@ class CollisionDetector
             }
         }
 
-        return $collidingTypes;
+        return new DetectionResult(
+            $filesScanned,
+            $filesExcluded,
+            $collidingTypes
+        );
     }
 
     private function stripCwdFromPath(string $path): string
