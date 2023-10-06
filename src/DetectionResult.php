@@ -8,12 +8,12 @@ class DetectionResult
     /**
      * @var int
      */
-    private $filesScanned;
+    private $analysedFilesCount;
 
     /**
      * @var int
      */
-    private $filesExcluded;
+    private $excludedFilesCount;
 
     /**
      * @var array<string, list<FileLine>>
@@ -23,21 +23,21 @@ class DetectionResult
     /**
      * @param array<string, list<FileLine>> $collisions
      */
-    public function __construct(int $filesScanned, int $filesExcluded, array $collisions)
+    public function __construct(int $analysedFilesCount, int $excludedFilesCount, array $collisions)
     {
-        $this->filesScanned = $filesScanned;
-        $this->filesExcluded = $filesExcluded;
+        $this->analysedFilesCount = $analysedFilesCount;
+        $this->excludedFilesCount = $excludedFilesCount;
         $this->collisions = $collisions;
     }
 
-    public function getFilesScanned(): int
+    public function getAnalysedFilesCount(): int
     {
-        return $this->filesScanned;
+        return $this->analysedFilesCount;
     }
 
-    public function getFilesExcluded(): int
+    public function getExcludedFilesCount(): int
     {
-        return $this->filesExcluded;
+        return $this->excludedFilesCount;
     }
 
     /**

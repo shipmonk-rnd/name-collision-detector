@@ -103,8 +103,8 @@ EOF;
         );
         $result = $detector->getCollidingTypes();
 
-        self::assertSame($expectedAnalysedFiles, $result->getFilesScanned());
-        self::assertSame($expectedExcludedFiles, $result->getFilesExcluded());
+        self::assertSame($expectedAnalysedFiles, $result->getAnalysedFilesCount());
+        self::assertSame($expectedExcludedFiles, $result->getExcludedFilesCount());
         self::assertEquals($expectedResults, $result->getCollisions());
     }
 
