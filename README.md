@@ -35,7 +35,7 @@ OK (no name collision found)
  * elapsed time: 1.057 s
 ```
 
-- Note the  performance: **10 000 files takes few seconds**!
+- Note the performance: **10 000 files takes few seconds**!
 
 ## Configuration:
 If file named `collision-detector.json` is present within current working directory, its contents are taken as configuration options. Possible config options:
