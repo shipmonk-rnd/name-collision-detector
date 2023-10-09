@@ -67,7 +67,12 @@ try {
     }
 
     $detector = new CollisionDetector($config);
-    $collisions = $detector->getCollidingTypes();
+
+    $startTime = microtime(true);
+    $result = $detector->getCollidingTypes();
+    $elapsedTime = microtime(true) - $startTime;
+
+    $collisions = $result->getCollisions();
 } catch (FileParsingException | InvalidConfigException $e) {
     $exit($e->getMessage());
 }
@@ -82,7 +87,10 @@ foreach ($collisions as $name => $fileLines) {
 }
 
 if ($collisions === []) {
-    echo "OK: no name collision found". PHP_EOL;
+    echo "OK (no name collision found)". PHP_EOL;
+    echo " * analysed files: " . $result->getAnalysedFilesCount() . PHP_EOL;
+    echo " * excluded files: " . $result->getExcludedFilesCount() . PHP_EOL;
+    echo " * elapsed time: " . round($elapsedTime, 3) . ' s' . PHP_EOL;
 }
 
 echo PHP_EOL;

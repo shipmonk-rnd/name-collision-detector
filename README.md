@@ -16,7 +16,7 @@ Check duplicate types:
 vendor/bin/detect-collisions dir1 dir2 dir3 # relative to cwd
 ```
 
-Example output:
+Example error output:
 ```
 Foo\NamespacedClass2 is defined 2 times:
  > /tests/sample-collisions/file2.php
@@ -26,6 +26,16 @@ GlobalInterface1 is defined 2 times:
  > /tests/sample-collisions/file1.php
  > /tests/sample-collisions/file2.php
 ```
+
+Example success output:
+```
+OK (no name collision found)
+ * analysed files: 9867
+ * excluded files: 0
+ * elapsed time: 1.057 s
+```
+
+- Note the performance: **10 000 files takes few seconds**!
 
 ## Configuration:
 If file named `collision-detector.json` is present within current working directory, its contents are taken as configuration options. Possible config options:

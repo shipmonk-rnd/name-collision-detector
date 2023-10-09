@@ -19,8 +19,8 @@ class CollisionDetectorTest extends TestCase
     {
         $expectedNoDirectoryRegex = '~^ERROR: No directories provided, use e.g. `detect-collisions src tests` or setup scanPaths in~';
         $expectedInvalidDirectoryRegex = '~^ERROR: Provided directory to scan ".*?nonsense" is not directory nor a file~';
-        $expectedSuccessWithConfigRegex = '~^Using config .*?' . PHP_EOL . PHP_EOL . 'OK: no name collision found~';
-        $expectedSuccessRegex = '~^OK: no name collision found~';
+        $expectedSuccessWithConfigRegex = '~^Using config .*?' . PHP_EOL . PHP_EOL . 'OK \(no name collision found\)~';
+        $expectedSuccessRegex = '~^OK \(no name collision found\)~';
 
         $space = ' '; // bypass editorconfig checker
         $expectedClasses = <<<EOF
@@ -85,7 +85,13 @@ EOF;
      * @param array<string, list<string>> $expectedResults
      * @dataProvider provideCases
      */
-    public function testCollisionDetection(array $paths, array $excludedPaths, array $expectedResults): void
+    public function testCollisionDetection(
+        array $paths,
+        array $excludedPaths,
+        int $expectedAnalysedFiles,
+        int $expectedExcludedFiles,
+        array $expectedResults
+    ): void
     {
         $detector = new CollisionDetector(
             new DetectionConfig(
@@ -95,12 +101,11 @@ EOF;
                 __DIR__
             )
         );
-        $collidingClasses = $detector->getCollidingTypes();
+        $result = $detector->getCollidingTypes();
 
-        self::assertEquals(
-            $expectedResults,
-            $collidingClasses
-        );
+        self::assertSame($expectedAnalysedFiles, $result->getAnalysedFilesCount());
+        self::assertSame($expectedExcludedFiles, $result->getExcludedFilesCount());
+        self::assertEquals($expectedResults, $result->getCollisions());
     }
 
     private function runCommand(string $command, int $expectedExitCode): string
@@ -143,18 +148,24 @@ EOF;
         yield 'allowed duplicates' => [
             'paths' => [__DIR__ . '/data/allowed-duplicates'],
             'excludedPaths' => [],
+            'expectedAnalysedFiles' => 1,
+            'expectedExcludedFiles' => 0,
             'expectedResults' => [],
         ];
 
         yield 'use statements' => [
             'paths' => [__DIR__ . '/data/use-statement'], // basically tests that isWithinUseStatement is working properly
             'excludedPaths' => [],
+            'expectedAnalysedFiles' => 3,
+            'expectedExcludedFiles' => 0,
             'expectedResults' => [],
         ];
 
         yield 'simple cases' => [
             'paths' => [__DIR__ . '/data/basic-cases/simple.php'],
             'excludedPaths' => [],
+            'expectedAnalysedFiles' => 1,
+            'expectedExcludedFiles' => 0,
             'expectedResults' => [
                 'DuplicateClass' => [
                     new FileLine('/data/basic-cases/simple.php', 3),
@@ -174,6 +185,8 @@ EOF;
         yield 'html case' => [
             'paths' => [__DIR__ . '/data/basic-cases/html.php'],
             'excludedPaths' => [],
+            'expectedAnalysedFiles' => 1,
+            'expectedExcludedFiles' => 0,
             'expectedResults' => [
                 'Bar' => [
                     new FileLine('/data/basic-cases/html.php', 3),
@@ -185,6 +198,8 @@ EOF;
         yield 'fatal error' => [
             'paths' => [__DIR__ . '/data/fatal-error/code.php'],
             'excludedPaths' => [],
+            'expectedAnalysedFiles' => 1,
+            'expectedExcludedFiles' => 0,
             'expectedResults' => [
                 'Exists' => [
                     new FileLine('/data/fatal-error/code.php', 6),
@@ -196,6 +211,8 @@ EOF;
         yield 'groups' => [
             'paths' => [__DIR__ . '/data/basic-cases/groups.php'],
             'excludedPaths' => [],
+            'expectedAnalysedFiles' => 1,
+            'expectedExcludedFiles' => 0,
             'expectedResults' => [
                 'Go' => [
                     new FileLine('/data/basic-cases/groups.php', 3),
@@ -209,6 +226,8 @@ EOF;
             yield 'groups with enum' => [
                 'paths' => [__DIR__ . '/data/basic-cases/groups-with-enum.php'],
                 'excludedPaths' => [],
+                'expectedAnalysedFiles' => 1,
+                'expectedExcludedFiles' => 0,
                 'expectedResults' => [
                     'Go' => [
                         new FileLine('/data/basic-cases/groups-with-enum.php', 3),
@@ -223,6 +242,8 @@ EOF;
         yield 'multi namespace' => [
             'paths' => [__DIR__ . '/data/basic-cases/multiple-namespaces.php'],
             'excludedPaths' => [],
+            'expectedAnalysedFiles' => 1,
+            'expectedExcludedFiles' => 0,
             'expectedResults' => [
                 'Foo\X' => [
                     new FileLine('/data/basic-cases/multiple-namespaces.php', 5),
@@ -234,6 +255,8 @@ EOF;
         yield 'multi namespace braced' => [
             'paths' => [__DIR__ . '/data/basic-cases/multiple-namespaces-braced.php'],
             'excludedPaths' => [],
+            'expectedAnalysedFiles' => 1,
+            'expectedExcludedFiles' => 0,
             'expectedResults' => [
                 'Foo\X' => [
                     new FileLine('/data/basic-cases/multiple-namespaces-braced.php', 4),
@@ -245,6 +268,8 @@ EOF;
         yield 'more files' => [
             'paths' => [__DIR__ . '/data/multiple-files'],
             'excludedPaths' => [],
+            'expectedAnalysedFiles' => 5,
+            'expectedExcludedFiles' => 0,
             'expectedResults' => [
                 'Foo\NamespacedClass' => [
                     new FileLine('/data/multiple-files/colliding1.php', 11),
@@ -276,6 +301,8 @@ EOF;
         yield 'more files with exclude' => [
             'paths' => [__DIR__ . '/data/multiple-files'],
             'excludedPaths' => [__DIR__ . '/data/multiple-files/colliding3.php'],
+            'expectedAnalysedFiles' => 4,
+            'expectedExcludedFiles' => 1,
             'expectedResults' => [
                 'GlobalClass' => [
                     new FileLine('/data/multiple-files/colliding1.php', 4),
