@@ -21,6 +21,7 @@
     <exclude-pattern>tests/data/*</exclude-pattern>
 
     <config name="installed_paths" value="../../slevomat/coding-standard"/>
+    <config name="php_version" value="70200"/>
 
     <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
     <rule ref="Generic.Classes.DuplicateClassName"/>
