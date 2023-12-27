@@ -21,6 +21,7 @@
     <exclude-pattern>tests/data/*</exclude-pattern>
 
     <config name="installed_paths" value="../../slevomat/coding-standard"/>
+    <config name="php_version" value="70200"/>
 
     <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
     <rule ref="Generic.Classes.DuplicateClassName"/>
@@ -244,10 +245,8 @@
         <severity>5</severity><!-- turned off by PSR2 -> turning on with default severity -->
     </rule>
 
-    <!-- rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma"/ --> <!-- after bumping PHP -->
-    <rule ref="SlevomatCodingStandard.Classes.ModernClassNameReference">
-        <exclude name="SlevomatCodingStandard.Classes.ModernClassNameReference.ClassNameReferencedViaFunctionCall"/> <!-- after bumping to PHP8 -->
-    </rule>
+    <rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma"/>
+    <rule ref="SlevomatCodingStandard.Classes.ModernClassNameReference"/>
     <!-- rule ref="SlevomatCodingStandard.Classes.ClassConstantVisibility"/ --> <!-- after bumping PHP -->
     <rule ref="SlevomatCodingStandard.Classes.ClassStructure">
         <properties>
@@ -300,11 +299,11 @@
     <rule ref="SlevomatCodingStandard.ControlStructures.NewWithParentheses"/>
     <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceOperator"/>
     <rule ref="SlevomatCodingStandard.Exceptions.DeadCatch"/>
-    <!-- rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch"/ --> <!-- after bumping PHP version -->
+    <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch"/>
     <rule ref="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly"/>
     <rule ref="SlevomatCodingStandard.Functions.DisallowArrowFunction"/>
     <rule ref="SlevomatCodingStandard.Functions.DisallowNamedArguments"/>
-    <!-- rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall"/ --> <!-- after bumping PHP version -->
+    <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall"/>
     <rule ref="SlevomatCodingStandard.Functions.StaticClosure"/>
     <rule ref="SlevomatCodingStandard.Functions.UselessParameterDefaultValue"/>
     <rule ref="SlevomatCodingStandard.Functions.UnusedInheritedVariablePassedToClosure"/>
