@@ -2721,16 +2721,16 @@
         },
         {
             "name": "shipmonk/composer-dependency-analyser",
-            "version": "1.0.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/shipmonk-rnd/composer-dependency-analyser.git",
-                "reference": "58da2ff17fcb82d363d906e9db668b5ddeb82222"
+                "reference": "d44a0ec7d3b66fd73d5c32981c81569c9b85bddc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shipmonk-rnd/composer-dependency-analyser/zipball/58da2ff17fcb82d363d906e9db668b5ddeb82222",
-                "reference": "58da2ff17fcb82d363d906e9db668b5ddeb82222",
+                "url": "https://api.github.com/repos/shipmonk-rnd/composer-dependency-analyser/zipball/d44a0ec7d3b66fd73d5c32981c81569c9b85bddc",
+                "reference": "d44a0ec7d3b66fd73d5c32981c81569c9b85bddc",
                 "shasum": ""
             },
             "require": {
@@ -2777,9 +2777,9 @@
             ],
             "support": {
                 "issues": "https://github.com/shipmonk-rnd/composer-dependency-analyser/issues",
-                "source": "https://github.com/shipmonk-rnd/composer-dependency-analyser/tree/1.0.0"
+                "source": "https://github.com/shipmonk-rnd/composer-dependency-analyser/tree/1.2.1"
             },
-            "time": "2024-01-17T13:41:26+00:00"
+            "time": "2024-02-16T10:44:07+00:00"
         },
         {
             "name": "slevomat/coding-standard",
