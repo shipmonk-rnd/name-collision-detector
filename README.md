@@ -19,12 +19,12 @@ vendor/bin/detect-collisions dir1 dir2 dir3 # relative to cwd
 Example error output:
 ```
 Foo\NamespacedClass2 is defined 2 times:
- > /tests/sample-collisions/file2.php
- > /tests/sample-collisions/file2.php
+ > /tests/sample-collisions/file2.php:23
+ > /tests/sample-collisions/file2.php:45
 
 GlobalInterface1 is defined 2 times:
- > /tests/sample-collisions/file1.php
- > /tests/sample-collisions/file2.php
+ > /tests/sample-collisions/file1.php:8
+ > /tests/sample-collisions/file2.php:11
 ```
 
 Example success output:
