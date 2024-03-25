@@ -4,8 +4,6 @@ Simple tool which allows you to detect if there are no types defined multiple ti
 This means that any ambiguous class, interface, enum, trait, constant or function is reported.
 Non-zero exit code is returned when any duplicate is found.
 
-No more `Warning: Ambiguous class resolution` issues during composer install!
-
 ## Installation:
 
 ```sh
