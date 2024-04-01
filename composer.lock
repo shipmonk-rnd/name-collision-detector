@@ -2721,26 +2721,27 @@
         },
         {
             "name": "shipmonk/composer-dependency-analyser",
-            "version": "1.2.1",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/shipmonk-rnd/composer-dependency-analyser.git",
-                "reference": "d44a0ec7d3b66fd73d5c32981c81569c9b85bddc"
+                "reference": "da787b1ec7e02e618f080e65f944a72a47a4696c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shipmonk-rnd/composer-dependency-analyser/zipball/d44a0ec7d3b66fd73d5c32981c81569c9b85bddc",
-                "reference": "d44a0ec7d3b66fd73d5c32981c81569c9b85bddc",
+                "url": "https://api.github.com/repos/shipmonk-rnd/composer-dependency-analyser/zipball/da787b1ec7e02e618f080e65f944a72a47a4696c",
+                "reference": "da787b1ec7e02e618f080e65f944a72a47a4696c",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
+                "ext-tokenizer": "*",
                 "php": "^7.2 || ^8.0"
             },
             "require-dev": {
                 "editorconfig-checker/editorconfig-checker": "^10.3.0",
                 "ergebnis/composer-normalize": "^2.19",
-                "phpstan/phpstan": "^1.10.30",
+                "phpstan/phpstan": "^1.10.63",
                 "phpstan/phpstan-phpunit": "^1.1.1",
                 "phpstan/phpstan-strict-rules": "^1.2.3",
                 "phpunit/phpunit": "^8.5.28 || ^9.5.20",
@@ -2777,9 +2778,9 @@
             ],
             "support": {
                 "issues": "https://github.com/shipmonk-rnd/composer-dependency-analyser/issues",
-                "source": "https://github.com/shipmonk-rnd/composer-dependency-analyser/tree/1.2.1"
+                "source": "https://github.com/shipmonk-rnd/composer-dependency-analyser/tree/1.4.0"
             },
-            "time": "2024-02-16T10:44:07+00:00"
+            "time": "2024-03-19T15:39:35+00:00"
         },
         {
             "name": "slevomat/coding-standard",
