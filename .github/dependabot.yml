@@ -8,7 +8,6 @@ updates:
         versioning-strategy: lockfile-only
         allow:
             - dependency-type: development
-        versioning-strategy: increase
         ignore:
             -
                 dependency-name: "*"
