@@ -1180,16 +1180,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.11.8",
+            "version": "1.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "6adbd118e6c0515dd2f36b06cde1d6da40f1b8ec"
+                "reference": "384af967d35b2162f69526c7276acadce534d0e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/6adbd118e6c0515dd2f36b06cde1d6da40f1b8ec",
-                "reference": "6adbd118e6c0515dd2f36b06cde1d6da40f1b8ec",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/384af967d35b2162f69526c7276acadce534d0e1",
+                "reference": "384af967d35b2162f69526c7276acadce534d0e1",
                 "shasum": ""
             },
             "require": {
@@ -1234,7 +1234,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-07-24T07:01:22+00:00"
+            "time": "2024-08-27T09:18:05+00:00"
         },
         {
             "name": "phpstan/phpstan-phpunit",
@@ -2724,16 +2724,16 @@
         },
         {
             "name": "shipmonk/composer-dependency-analyser",
-            "version": "1.6.1",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/shipmonk-rnd/composer-dependency-analyser.git",
-                "reference": "9252ee58b802328237ebbd4e1decb002823afbb2"
+                "reference": "bca862b2830a453734aee048eb0cdab82e5c9da3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shipmonk-rnd/composer-dependency-analyser/zipball/9252ee58b802328237ebbd4e1decb002823afbb2",
-                "reference": "9252ee58b802328237ebbd4e1decb002823afbb2",
+                "url": "https://api.github.com/repos/shipmonk-rnd/composer-dependency-analyser/zipball/bca862b2830a453734aee048eb0cdab82e5c9da3",
+                "reference": "bca862b2830a453734aee048eb0cdab82e5c9da3",
                 "shasum": ""
             },
             "require": {
@@ -2784,9 +2784,9 @@
             ],
             "support": {
                 "issues": "https://github.com/shipmonk-rnd/composer-dependency-analyser/issues",
-                "source": "https://github.com/shipmonk-rnd/composer-dependency-analyser/tree/1.6.1"
+                "source": "https://github.com/shipmonk-rnd/composer-dependency-analyser/tree/1.7.0"
             },
-            "time": "2024-07-02T20:09:30+00:00"
+            "time": "2024-08-08T08:12:32+00:00"
         },
         {
             "name": "slevomat/coding-standard",
