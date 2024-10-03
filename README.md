@@ -58,7 +58,7 @@ And in such cases, the test may work when executed in standalone run, but fail w
 Therefore, having a collision detector in CI might be useful.
 
 ## Composer's Ambiguous class resolution
-You may have thought that Composer itself is somehow solving this, but that is not true. The only similar check that Composer performs (which results in `Warning: Ambiguous class resolution`) happens when classes collide **inside** the `vendor` path, not in your codebase. Composer does not report class ambiguity in your project at all.
+The check that Composer performs (which results in `Warning: Ambiguous class resolution`) [has some weird hidden ignores](https://github.com/composer/composer/issues/12140#issuecomment-2389035210) that makes it generally not usable.
 
 ## Supported PHP versions
 - PHP 7.2 - PHP 8.3
