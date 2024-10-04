@@ -57,8 +57,11 @@ Typically, you have PSR-4 autoloading which often solves this problem for you, b
 And in such cases, the test may work when executed in standalone run, but fail when running all the tests together (depending on which class was autoloaded first).
 Therefore, having a collision detector in CI might be useful.
 
-## Composer's Ambiguous class resolution
-The check that Composer performs (which results in `Warning: Ambiguous class resolution`) [has some weird hidden ignores](https://github.com/composer/composer/issues/12140#issuecomment-2389035210) that makes it generally not usable.
+## Composer's ambiguous class resolution
+Composer can also detect class duplicates and exit with non-zero, but it runs much slower and lacks function and constant detection. Using composer version `>= 2.8.1`, you can use:
+```sh
+composer dump --optimize --strict-ambiguous
+```
 
 ## Supported PHP versions
 - PHP 7.2 - PHP 8.3
