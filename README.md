@@ -64,5 +64,5 @@ composer dump --optimize --strict-ambiguous
 ```
 
 ## Supported PHP versions
-- PHP 7.2 - PHP 8.3
+- PHP 7.2 - PHP 8.4
 
