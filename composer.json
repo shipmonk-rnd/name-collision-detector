@@ -58,16 +58,16 @@
             "@check:dependencies",
             "@check:self"
         ],
-        "check:composer": "composer normalize --dry-run --no-check-lock --no-update-lock",
-        "check:cs": "phpcs",
-        "check:dependencies": [
-            "composer dump-autoload --classmap-authoritative",
-            "composer-dependency-analyser"
+        "check:composer": [
+            "composer normalize --dry-run --no-check-lock --no-update-lock",
+            "composer validate --strict"
         ],
+        "check:cs": "phpcs",
+        "check:dependencies": "composer-dependency-analyser",
         "check:ec": "ec src tests",
         "check:self": "bin/detect-collisions src",
         "check:tests": "phpunit -vvv tests",
-        "check:types": "phpstan analyse -vvv",
+        "check:types": "phpstan analyse -vv",
         "fix:cs": "phpcbf"
     }
 }
