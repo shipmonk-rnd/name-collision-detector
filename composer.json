@@ -58,7 +58,10 @@
             "@check:dependencies",
             "@check:self"
         ],
-        "check:composer": "composer normalize --dry-run --no-check-lock --no-update-lock",
+        "check:composer": [
+            "composer normalize --dry-run --no-check-lock --no-update-lock",
+            "composer validate --strict"
+        ],
         "check:cs": "phpcs",
         "check:dependencies": "composer-dependency-analyser",
         "check:ec": "ec src tests",
