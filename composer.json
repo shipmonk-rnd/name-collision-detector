@@ -67,7 +67,7 @@
         "check:ec": "ec src tests",
         "check:self": "bin/detect-collisions src",
         "check:tests": "phpunit -vvv tests",
-        "check:types": "phpstan analyse -vvv",
+        "check:types": "phpstan analyse -vv",
         "fix:cs": "phpcbf"
     }
 }
