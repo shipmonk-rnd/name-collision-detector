@@ -82,7 +82,7 @@ EOF;
     /**
      * @param list<string> $paths
      * @param list<string> $excludedPaths
-     * @param array<string, list<string>> $expectedResults
+     * @param array<string, list<FileLine>> $expectedResults
      */
     #[DataProvider('provideCases')]
     public function testCollisionDetection(

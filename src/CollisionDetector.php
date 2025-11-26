@@ -261,7 +261,7 @@ class CollisionDetector
      *
      * Use statement with braces "use Foo\{ function fn }" is filtered out by $level === $minLevel condition above
      *
-     * @param array<int, PhpToken> $tokens
+     * @param array<PhpToken> $tokens
      */
     private function isWithinUseStatement(
         array $tokens,
