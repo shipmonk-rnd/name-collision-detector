@@ -144,7 +144,7 @@ EOF;
     }
 
     /**
-     * @return iterable<mixed>
+     * @return iterable<array{paths: list<string>, excludedPaths: list<string>, expectedAnalysedFiles: int, expectedExcludedFiles: int, expectedResults: array<string, list<FileLine>>}>
      */
     public static function provideCases(): iterable
     {

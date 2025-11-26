@@ -2,7 +2,6 @@
 
 namespace ShipMonk\NameCollision;
 
-use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ShipMonk\NameCollision\Exception\InvalidConfigException;
@@ -51,9 +50,9 @@ class DetectionConfigTest extends TestCase
     }
 
     /**
-     * @return Generator<mixed>
+     * @return iterable<array{cliArguments: list<string>, cwd: string, configPath: string, resultingScanPaths: list<string>|null, resultingExcludePaths: list<string>|null, resultingFileExtensions: list<string>|null, resultingIgnoreParseFailure: bool|null, error: string|null}>
      */
-    public static function provideConfigs(): Generator
+    public static function provideConfigs(): iterable
     {
         yield 'no directory provided anywhere' => [
             'cliArguments' => [],
