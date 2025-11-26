@@ -21,7 +21,7 @@
     <exclude-pattern>tests/data/*</exclude-pattern>
 
     <config name="installed_paths" value="../../slevomat/coding-standard"/>
-    <config name="php_version" value="70200"/>
+    <config name="php_version" value="80000"/>
 
     <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
     <rule ref="Generic.Classes.DuplicateClassName"/>
@@ -50,7 +50,6 @@
             <property name="maxPadding" value="1"/>
         </properties>
     </rule>
-    <rule ref="Generic.Functions.CallTimePassByReference"/>
     <rule ref="Generic.Functions.OpeningFunctionBraceBsdAllman"/>
     <rule ref="Generic.NamingConventions.ConstructorName"/>
     <rule ref="Generic.PHP.BacktickOperator"/>
@@ -63,28 +62,24 @@
     <rule ref="Generic.PHP.DisallowShortOpenTag"/>
     <rule ref="Generic.PHP.ForbiddenFunctions">
         <properties>
-            <property
-                name="forbiddenFunctions"
-                type="array"
-                value="
-                    mt_rand=>rand,
-                    sizeof=>count,
-                    delete=>unset,
-                    print=>echo,
-                    join=>implode,
-                    split=>explode,
-                    is_null=>null,
-                    create_function=>null,
-                    key_exists=>array_key_exists,
-                    floatval=>null,
-                    boolval=>null,
-                    intval=>null,
-                    strval=>null,
-                    settype=>null,
-                    exit=>null,
-                    reset=>array_key_first
-                "
-            />
+            <property name="forbiddenFunctions" type="array">
+                <element key="mt_rand" value="rand"/>
+                <element key="sizeof" value="count"/>
+                <element key="delete" value="unset"/>
+                <element key="print" value="echo"/>
+                <element key="join" value="implode"/>
+                <element key="split" value="explode"/>
+                <element key="is_null" value="null"/>
+                <element key="create_function" value="null"/>
+                <element key="key_exists" value="array_key_exists"/>
+                <element key="floatval" value="null"/>
+                <element key="boolval" value="null"/>
+                <element key="intval" value="null"/>
+                <element key="strval" value="null"/>
+                <element key="settype" value="null"/>
+                <element key="exit" value="null"/>
+                <element key="reset" value="array_key_first"/>
+            </property>
         </properties>
     </rule>
     <rule ref="Generic.Strings.UnnecessaryStringConcat">
@@ -222,7 +217,6 @@
             <property name="spacing" value="1"/>
         </properties>
     </rule>
-    <rule ref="Squiz.WhiteSpace.LanguageConstructSpacing"/>
     <rule ref="Squiz.WhiteSpace.LogicalOperatorSpacing"/>
     <rule ref="Squiz.WhiteSpace.MemberVarSpacing"/>
     <rule ref="Squiz.WhiteSpace.ObjectOperatorSpacing">
@@ -285,12 +279,26 @@
     <rule ref="SlevomatCodingStandard.Commenting.UselessInheritDocComment"/>
     <rule ref="SlevomatCodingStandard.Commenting.ForbiddenComments">
         <properties>
-            <property name="forbiddenCommentPatterns" type="array" value="~^[a-zA-Z0-9]+ constructor.?$~,~PhpStorm~,~^[GS]et [a-zA-Z0-9]+$~"/>
+            <property name="forbiddenCommentPatterns" type="array">
+                <element value="~^[a-zA-Z0-9]+ constructor.?$~"/>
+                <element value="~PhpStorm~"/>
+                <element value="~^[GS]et [a-zA-Z0-9]+$~"/>
+            </property>
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.Commenting.ForbiddenAnnotations">
         <properties>
-            <property name="forbiddenAnnotations" type="array" value="@author,@created,@version,@package,@copyright,@since,@link,@group,@expectedException" />
+            <property name="forbiddenAnnotations" type="array">
+                <element value="@author"/>
+                <element value="@created"/>
+                <element value="@version"/>
+                <element value="@package"/>
+                <element value="@copyright"/>
+                <element value="@since"/>
+                <element value="@link"/>
+                <element value="@group"/>
+                <element value="@expectedException"/>
+            </property>
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.ControlStructures.AssignmentInCondition"/>
@@ -359,33 +367,33 @@
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue" />
     <rule ref="SlevomatCodingStandard.TypeHints.NullTypeHintOnLastPosition" />
-    <rule ref="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat" />
+    <rule ref="SlevomatCodingStandard.TypeHints.DNFTypeHintFormat" />
     <rule ref="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint" />
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
         <properties>
             <property name="enableNativeTypeHint" value="false"/>
-            <property name="traversableTypeHints" type="array" value="
-                Generator,
-                Traversable
-            "/>
+            <property name="traversableTypeHints" type="array">
+                <element value="Generator"/>
+                <element value="Traversable"/>
+            </property>
         </properties>
     </rule>
 
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint">
         <properties>
             <property name="enableMixedTypeHint" value="false"/>
-            <property name="traversableTypeHints" type="array" value="
-                Generator,
-                Traversable
-            "/>
+            <property name="traversableTypeHints" type="array">
+                <element value="Generator"/>
+                <element value="Traversable"/>
+            </property>
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint">
         <properties>
-            <property name="traversableTypeHints" type="array" value="
-                Generator,
-                Traversable
-            "/>
+            <property name="traversableTypeHints" type="array">
+                <element value="Generator"/>
+                <element value="Traversable"/>
+            </property>
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.LongTypeHints"/>

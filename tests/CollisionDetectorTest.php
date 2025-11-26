@@ -72,8 +72,8 @@ EOF;
                 [__DIR__ . '/data/parse-error/code.php'],
                 [],
                 ['php'],
-                __DIR__
-            )
+                __DIR__,
+            ),
         );
         self::expectException(FileParsingException::class);
         $detector->getCollidingTypes();
@@ -98,8 +98,8 @@ EOF;
                 $paths,
                 $excludedPaths,
                 ['php'],
-                __DIR__
-            )
+                __DIR__,
+            ),
         );
         $result = $detector->getCollidingTypes();
 
@@ -134,7 +134,7 @@ EOF;
             $expectedExitCode,
             $exitCode,
             "Output was:\n" . $output . "\n" .
-            "Error was:\n" . $errorOutput . "\n"
+            "Error was:\n" . $errorOutput . "\n",
         );
 
         return $output;
