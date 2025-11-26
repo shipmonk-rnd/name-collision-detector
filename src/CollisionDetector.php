@@ -21,8 +21,10 @@ use function strpos;
 use function substr;
 use function usort;
 use const T_CLASS;
+use const T_COMMENT;
 use const T_CONST;
 use const T_CURLY_OPEN;
+use const T_DOC_COMMENT;
 use const T_DOLLAR_OPEN_CURLY_BRACES;
 use const T_ENUM;
 use const T_FUNCTION;
@@ -32,6 +34,7 @@ use const T_NAMESPACE;
 use const T_STRING;
 use const T_TRAIT;
 use const T_USE;
+use const T_WHITESPACE;
 use const TOKEN_PARSE;
 
 class CollisionDetector
@@ -41,11 +44,10 @@ class CollisionDetector
     public const TYPE_GROUP_FUNCTION = 'function';
     public const TYPE_GROUP_CONSTANT = 'const';
 
-    private DetectionConfig $config;
-
-    public function __construct(DetectionConfig $config)
+    public function __construct(
+        private DetectionConfig $config,
+    )
     {
-        $this->config = $config;
     }
 
     /**
@@ -160,32 +162,40 @@ class CollisionDetector
         }
 
         foreach ($tokens as $index => $token) {
-            if ($token->isIgnorable()) {
-                continue;
-            }
+            switch ($token->id) {
+                case T_COMMENT:
+                case T_DOC_COMMENT:
+                case T_WHITESPACE:
+                    continue 2;
 
-            if ($token->is([T_STRING, T_NAME_QUALIFIED])) {
-                if ($expected !== null) {
-                    $name .= $token->text;
-                }
+                case T_STRING:
+                case T_NAME_QUALIFIED:
+                    if ($expected !== null) {
+                        $name .= $token->text;
+                    }
 
-                continue;
-            }
+                    continue 2;
 
-            if ($token->is([T_CONST, T_FUNCTION, T_NAMESPACE, T_CLASS, T_INTERFACE, T_TRAIT, T_ENUM])) {
-                if (
-                    !$token->is([T_FUNCTION, T_CONST])
-                    || !$this->isWithinUseStatement($tokens, $index)
-                ) {
+                case T_CONST:
+                case T_FUNCTION:
+                    if ($this->isWithinUseStatement($tokens, $index)) {
+                        break; // "use const" or "use function" statement, not a definition
+                    }
+                    // no break - process as definition
+
+                case T_NAMESPACE:
+                case T_CLASS:
+                case T_INTERFACE:
+                case T_TRAIT:
+                case T_ENUM:
                     $expected = $token->id;
                     $line = $token->line;
                     $name = '';
-                    continue;
-                }
-            }
+                    continue 2;
 
-            if ($token->is([T_CURLY_OPEN, T_DOLLAR_OPEN_CURLY_BRACES])) {
-                $level++;
+                case T_CURLY_OPEN:
+                case T_DOLLAR_OPEN_CURLY_BRACES:
+                    $level++;
             }
 
             $tokenText = $token->text;
@@ -261,7 +271,7 @@ class CollisionDetector
         do {
             $previousToken = $tokens[--$index];
 
-            if ($previousToken->is(T_USE)) {
+            if ($previousToken->id === T_USE) {
                 return true;
             }
         } while ($previousToken->isIgnorable());

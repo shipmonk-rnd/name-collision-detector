@@ -3,3 +3,4 @@
 !/cache/.gitkeep
 /.idea
 /phpstan.neon
+.phpunit.result.cache

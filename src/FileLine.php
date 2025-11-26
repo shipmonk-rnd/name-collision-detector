@@ -9,15 +9,12 @@ class FileLine
 
     private string $filePath;
 
-    private int $line;
-
     public function __construct(
         string $filePath,
-        int $line,
+        private int $line,
     )
     {
         $this->filePath = str_replace('\\', '/', $filePath);
-        $this->line = $line;
     }
 
     public function getFilePath(): string
