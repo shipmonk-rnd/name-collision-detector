@@ -5,25 +5,23 @@ namespace ShipMonk\NameCollision;
 class DetectionResult
 {
 
-    /**
-     * @var int
-     */
-    private $analysedFilesCount;
+    private int $analysedFilesCount;
 
-    /**
-     * @var int
-     */
-    private $excludedFilesCount;
+    private int $excludedFilesCount;
 
     /**
      * @var array<string, list<FileLine>>
      */
-    private $collisions;
+    private array $collisions;
 
     /**
      * @param array<string, list<FileLine>> $collisions
      */
-    public function __construct(int $analysedFilesCount, int $excludedFilesCount, array $collisions)
+    public function __construct(
+        int $analysedFilesCount,
+        int $excludedFilesCount,
+        array $collisions,
+    )
     {
         $this->analysedFilesCount = $analysedFilesCount;
         $this->excludedFilesCount = $excludedFilesCount;

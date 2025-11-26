@@ -3,6 +3,7 @@
 namespace ShipMonk\NameCollision;
 
 use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ShipMonk\NameCollision\Exception\InvalidConfigException;
 use function realpath;
@@ -15,8 +16,8 @@ class DetectionConfigTest extends TestCase
      * @param list<string>|null $resultingScanPaths
      * @param list<string>|null $resultingExcludePaths
      * @param list<string>|null $resultingFileExtensions
-     * @dataProvider provideConfigs
      */
+    #[DataProvider('provideConfigs')]
     public function testConfig(
         array $cliArguments,
         string $cwd,
@@ -25,7 +26,7 @@ class DetectionConfigTest extends TestCase
         ?array $resultingExcludePaths,
         ?array $resultingFileExtensions,
         ?bool $resultingIgnoreParseFailure,
-        ?string $error
+        ?string $error,
     ): void
     {
         try {
@@ -52,7 +53,7 @@ class DetectionConfigTest extends TestCase
     /**
      * @return Generator<mixed>
      */
-    public function provideConfigs(): Generator
+    public static function provideConfigs(): Generator
     {
         yield 'no directory provided anywhere' => [
             'cliArguments' => [],

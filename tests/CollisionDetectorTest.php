@@ -2,6 +2,7 @@
 
 namespace ShipMonk\NameCollision;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ShipMonk\NameCollision\Exception\FileParsingException;
 use function fclose;
@@ -10,7 +11,6 @@ use function proc_close;
 use function proc_open;
 use function stream_get_contents;
 use const PHP_EOL;
-use const PHP_VERSION_ID;
 
 class CollisionDetectorTest extends TestCase
 {
@@ -83,14 +83,14 @@ EOF;
      * @param list<string> $paths
      * @param list<string> $excludedPaths
      * @param array<string, list<string>> $expectedResults
-     * @dataProvider provideCases
      */
+    #[DataProvider('provideCases')]
     public function testCollisionDetection(
         array $paths,
         array $excludedPaths,
         int $expectedAnalysedFiles,
         int $expectedExcludedFiles,
-        array $expectedResults
+        array $expectedResults,
     ): void
     {
         $detector = new CollisionDetector(
@@ -108,7 +108,10 @@ EOF;
         self::assertEquals($expectedResults, $result->getCollisions());
     }
 
-    private function runCommand(string $command, int $expectedExitCode): string
+    private function runCommand(
+        string $command,
+        int $expectedExitCode,
+    ): string
     {
         $desc = [
             ['pipe', 'r'],
@@ -141,9 +144,9 @@ EOF;
     }
 
     /**
-     * @return mixed[]
+     * @return iterable<mixed>
      */
-    public function provideCases(): iterable
+    public static function provideCases(): iterable
     {
         yield 'allowed duplicates' => [
             'paths' => [__DIR__ . '/data/allowed-duplicates'],
@@ -222,22 +225,20 @@ EOF;
             ],
         ];
 
-        if (PHP_VERSION_ID >= 80100) {
-            yield 'groups with enum' => [
-                'paths' => [__DIR__ . '/data/basic-cases/groups-with-enum.php'],
-                'excludedPaths' => [],
-                'expectedAnalysedFiles' => 1,
-                'expectedExcludedFiles' => 0,
-                'expectedResults' => [
-                    'Go' => [
-                        new FileLine('/data/basic-cases/groups-with-enum.php', 3),
-                        new FileLine('/data/basic-cases/groups-with-enum.php', 4),
-                        new FileLine('/data/basic-cases/groups-with-enum.php', 5),
-                        new FileLine('/data/basic-cases/groups-with-enum.php', 6),
-                    ],
+        yield 'groups with enum' => [
+            'paths' => [__DIR__ . '/data/basic-cases/groups-with-enum.php'],
+            'excludedPaths' => [],
+            'expectedAnalysedFiles' => 1,
+            'expectedExcludedFiles' => 0,
+            'expectedResults' => [
+                'Go' => [
+                    new FileLine('/data/basic-cases/groups-with-enum.php', 3),
+                    new FileLine('/data/basic-cases/groups-with-enum.php', 4),
+                    new FileLine('/data/basic-cases/groups-with-enum.php', 5),
+                    new FileLine('/data/basic-cases/groups-with-enum.php', 6),
                 ],
-            ];
-        }
+            ],
+        ];
 
         yield 'multi namespace' => [
             'paths' => [__DIR__ . '/data/basic-cases/multiple-namespaces.php'],

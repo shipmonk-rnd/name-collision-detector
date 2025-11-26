@@ -7,17 +7,14 @@ use function str_replace;
 class FileLine
 {
 
-    /**
-     * @var string
-     */
-    private $filePath;
+    private string $filePath;
 
-    /**
-     * @var int
-     */
-    private $line;
+    private int $line;
 
-    public function __construct(string $filePath, int $line)
+    public function __construct(
+        string $filePath,
+        int $line,
+    )
     {
         $this->filePath = str_replace('\\', '/', $filePath);
         $this->line = $line;
