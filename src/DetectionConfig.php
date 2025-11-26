@@ -56,6 +56,7 @@ class DetectionConfig
      * @param list<string> $scanPaths Absolute paths
      * @param list<string> $excludePaths Absolute paths
      * @param list<string> $fileExtensions
+     *
      * @internal only for tests
      */
     public function __construct(
@@ -89,9 +90,14 @@ class DetectionConfig
 
     /**
      * @param list<string> $providedDirectories
+     *
      * @throws InvalidConfigException
      */
-    public static function fromConfigFile(array $providedDirectories, string $currentDirectory, string $configFilePath): self
+    public static function fromConfigFile(
+        array $providedDirectories,
+        string $currentDirectory,
+        string $configFilePath
+    ): self
     {
         if (!extension_loaded('json')) {
             throw new InvalidConfigException("Json extension not loaded, unable to parse config file: $configFilePath");
@@ -131,9 +137,13 @@ class DetectionConfig
 
     /**
      * @param list<string> $providedPaths
+     *
      * @throws InvalidConfigException
      */
-    public static function fromDefaults(array $providedPaths, string $currentDirectory): self
+    public static function fromDefaults(
+        array $providedPaths,
+        string $currentDirectory
+    ): self
     {
         return self::fromConfigData($providedPaths, $currentDirectory, $currentDirectory, []);
     }
@@ -141,7 +151,10 @@ class DetectionConfig
     /**
      * @throws InvalidConfigException
      */
-    private static function joinPath(string $directory, string $path): string
+    private static function joinPath(
+        string $directory,
+        string $path
+    ): string
     {
         $absolutePath = $directory . DIRECTORY_SEPARATOR . $path;
 
@@ -155,6 +168,7 @@ class DetectionConfig
     /**
      * @param list<string> $providedDirectories
      * @param mixed $configData
+     *
      * @throws InvalidConfigException
      */
     private static function fromConfigData(

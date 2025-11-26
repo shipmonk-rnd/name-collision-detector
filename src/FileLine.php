@@ -17,7 +17,10 @@ class FileLine
      */
     private $line;
 
-    public function __construct(string $filePath, int $line)
+    public function __construct(
+        string $filePath,
+        int $line
+    )
     {
         $this->filePath = str_replace('\\', '/', $filePath);
         $this->line = $line;

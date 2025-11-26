@@ -15,6 +15,7 @@ class DetectionConfigTest extends TestCase
      * @param list<string>|null $resultingScanPaths
      * @param list<string>|null $resultingExcludePaths
      * @param list<string>|null $resultingFileExtensions
+     *
      * @dataProvider provideConfigs
      */
     public function testConfig(

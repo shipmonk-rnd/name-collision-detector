@@ -145,8 +145,9 @@ class CollisionDetector
      * Searches enums, classes, interfaces, constants, functions and traits in PHP file.
      * Based on Nette\Loaders\RobotLoader::scanPhp
      *
-     * @license https://github.com/nette/robot-loader/blob/v3.4.0/license.md
      * @return array<self::TYPE_GROUP_*, list<array{line: int, name: string}>>
+     *
+     * @license https://github.com/nette/robot-loader/blob/v3.4.0/license.md
      * @throws FileParsingException
      */
     private function getTypesInFile(string $file): array
@@ -275,7 +276,10 @@ class CollisionDetector
      *
      * @param mixed[] $tokens
      */
-    private function isWithinUseStatement(array $tokens, int $index): bool
+    private function isWithinUseStatement(
+        array $tokens,
+        int $index
+    ): bool
     {
         do {
             $previousToken = $tokens[--$index];

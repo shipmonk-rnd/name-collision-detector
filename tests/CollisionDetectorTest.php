@@ -83,6 +83,7 @@ EOF;
      * @param list<string> $paths
      * @param list<string> $excludedPaths
      * @param array<string, list<string>> $expectedResults
+     *
      * @dataProvider provideCases
      */
     public function testCollisionDetection(
@@ -108,7 +109,10 @@ EOF;
         self::assertEquals($expectedResults, $result->getCollisions());
     }
 
-    private function runCommand(string $command, int $expectedExitCode): string
+    private function runCommand(
+        string $command,
+        int $expectedExitCode
+    ): string
     {
         $desc = [
             ['pipe', 'r'],

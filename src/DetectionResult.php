@@ -23,7 +23,11 @@ class DetectionResult
     /**
      * @param array<string, list<FileLine>> $collisions
      */
-    public function __construct(int $analysedFilesCount, int $excludedFilesCount, array $collisions)
+    public function __construct(
+        int $analysedFilesCount,
+        int $excludedFilesCount,
+        array $collisions
+    )
     {
         $this->analysedFilesCount = $analysedFilesCount;
         $this->excludedFilesCount = $excludedFilesCount;
