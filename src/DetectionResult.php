@@ -6,28 +6,14 @@ class DetectionResult
 {
 
     /**
-     * @var int
-     */
-    private $analysedFilesCount;
-
-    /**
-     * @var int
-     */
-    private $excludedFilesCount;
-
-    /**
-     * @var array<string, list<FileLine>>
-     */
-    private $collisions;
-
-    /**
      * @param array<string, list<FileLine>> $collisions
      */
-    public function __construct(int $analysedFilesCount, int $excludedFilesCount, array $collisions)
+    public function __construct(
+        private int $analysedFilesCount,
+        private int $excludedFilesCount,
+        private array $collisions,
+    )
     {
-        $this->analysedFilesCount = $analysedFilesCount;
-        $this->excludedFilesCount = $excludedFilesCount;
-        $this->collisions = $collisions;
     }
 
     public function getAnalysedFilesCount(): int

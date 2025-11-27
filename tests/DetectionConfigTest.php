@@ -2,7 +2,7 @@
 
 namespace ShipMonk\NameCollision;
 
-use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ShipMonk\NameCollision\Exception\InvalidConfigException;
 use function realpath;
@@ -15,8 +15,8 @@ class DetectionConfigTest extends TestCase
      * @param list<string>|null $resultingScanPaths
      * @param list<string>|null $resultingExcludePaths
      * @param list<string>|null $resultingFileExtensions
-     * @dataProvider provideConfigs
      */
+    #[DataProvider('provideConfigs')]
     public function testConfig(
         array $cliArguments,
         string $cwd,
@@ -25,7 +25,7 @@ class DetectionConfigTest extends TestCase
         ?array $resultingExcludePaths,
         ?array $resultingFileExtensions,
         ?bool $resultingIgnoreParseFailure,
-        ?string $error
+        ?string $error,
     ): void
     {
         try {
@@ -50,9 +50,9 @@ class DetectionConfigTest extends TestCase
     }
 
     /**
-     * @return Generator<mixed>
+     * @return iterable<array{cliArguments: list<string>, cwd: string, configPath: string, resultingScanPaths: list<string>|null, resultingExcludePaths: list<string>|null, resultingFileExtensions: list<string>|null, resultingIgnoreParseFailure: bool|null, error: string|null}>
      */
-    public function provideConfigs(): Generator
+    public static function provideConfigs(): iterable
     {
         yield 'no directory provided anywhere' => [
             'cliArguments' => [],
@@ -124,7 +124,7 @@ class DetectionConfigTest extends TestCase
             'cliArguments' => ['.'],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/empty.json',
-            'resultingScanPaths' => [realpath(__DIR__ . '/.')],
+            'resultingScanPaths' => [(string) realpath(__DIR__ . '/.')],
             'resultingExcludePaths' => [],
             'resultingFileExtensions' => ['php'],
             'resultingIgnoreParseFailure' => false,
@@ -135,8 +135,8 @@ class DetectionConfigTest extends TestCase
             'cliArguments' => [],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/valid.json',
-            'resultingScanPaths' => [realpath(__DIR__ . '/data/config-files')],
-            'resultingExcludePaths' => [realpath(__DIR__ . '/data/config-files/valid.json')],
+            'resultingScanPaths' => [(string) realpath(__DIR__ . '/data/config-files')],
+            'resultingExcludePaths' => [(string) realpath(__DIR__ . '/data/config-files/valid.json')],
             'resultingFileExtensions' => ['.php8'],
             'resultingIgnoreParseFailure' => true,
             'error' => null,
@@ -146,8 +146,8 @@ class DetectionConfigTest extends TestCase
             'cliArguments' => ['data'],
             'cwd' => __DIR__,
             'configPath' => __DIR__ . '/data/config-files/valid.json',
-            'resultingScanPaths' => [realpath(__DIR__ . '/data')],
-            'resultingExcludePaths' => [realpath(__DIR__ . '/data/config-files/valid.json')],
+            'resultingScanPaths' => [(string) realpath(__DIR__ . '/data')],
+            'resultingExcludePaths' => [(string) realpath(__DIR__ . '/data/config-files/valid.json')],
             'resultingFileExtensions' => ['.php8'],
             'resultingIgnoreParseFailure' => true,
             'error' => null,

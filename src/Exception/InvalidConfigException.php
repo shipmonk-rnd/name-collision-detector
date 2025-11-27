@@ -7,7 +7,10 @@ use Throwable;
 class InvalidConfigException extends RuntimeException
 {
 
-    public function __construct(string $reason, ?Throwable $previous = null)
+    public function __construct(
+        string $reason,
+        ?Throwable $previous = null,
+    )
     {
         parent::__construct($reason, $previous);
     }

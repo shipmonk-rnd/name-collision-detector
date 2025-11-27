@@ -13,7 +13,7 @@
         "autoloading"
     ],
     "require": {
-        "php": "^7.2 || ^8.0",
+        "php": "^8.1",
         "ext-json": "*",
         "ext-tokenizer": "*",
         "nette/schema": "^1.1.0"
@@ -21,12 +21,12 @@
     "require-dev": {
         "editorconfig-checker/editorconfig-checker": "^10.3.0",
         "ergebnis/composer-normalize": "^2.19",
-        "phpstan/phpstan": "^1.8.7",
-        "phpstan/phpstan-phpunit": "^1.1.1",
-        "phpstan/phpstan-strict-rules": "^1.2.3",
-        "phpunit/phpunit": "^8.5.28 || ^9.5.20",
-        "shipmonk/composer-dependency-analyser": "^1.0.0",
-        "slevomat/coding-standard": "^8.0.1"
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpunit/phpunit": "^10.5 || ^11.0",
+        "shipmonk/coding-standard": "^0.2.0",
+        "shipmonk/composer-dependency-analyser": "^1.0.0"
     },
     "autoload": {
         "psr-4": {
@@ -66,7 +66,7 @@
         "check:dependencies": "composer-dependency-analyser",
         "check:ec": "ec src tests",
         "check:self": "bin/detect-collisions src",
-        "check:tests": "phpunit -vvv tests",
+        "check:tests": "phpunit tests",
         "check:types": "phpstan analyse -vv",
         "fix:cs": "phpcbf"
     }

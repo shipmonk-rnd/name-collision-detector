@@ -17,12 +17,10 @@ use function is_dir;
 use function is_file;
 use function is_readable;
 use function json_decode;
-use function json_last_error;
-use function json_last_error_msg;
 use function realpath;
 use const DIRECTORY_SEPARATOR;
-use const JSON_ERROR_NONE;
 use const JSON_PRESERVE_ZERO_FRACTION;
+use const JSON_THROW_ON_ERROR;
 
 class DetectionConfig
 {
@@ -30,32 +28,27 @@ class DetectionConfig
     /**
      * @var list<string>
      */
-    private $scanPaths;
+    private array $scanPaths;
 
     /**
      * @var list<string>
      */
-    private $excludePaths;
+    private array $excludePaths;
 
     /**
      * @var list<string>
      */
-    private $fileExtensions;
+    private array $fileExtensions;
 
-    /**
-     * @var string
-     */
-    private $currentDirectory;
+    private string $currentDirectory;
 
-    /**
-     * @var bool
-     */
-    private $ignoreParseFailures;
+    private bool $ignoreParseFailures;
 
     /**
      * @param list<string> $scanPaths Absolute paths
      * @param list<string> $excludePaths Absolute paths
      * @param list<string> $fileExtensions
+     *
      * @internal only for tests
      */
     public function __construct(
@@ -63,7 +56,7 @@ class DetectionConfig
         array $excludePaths,
         array $fileExtensions,
         string $currentDirectory,
-        bool $ignoreParseFailures = false
+        bool $ignoreParseFailures = false,
     )
     {
         $normalizePath = static function (string $path): string {
@@ -89,9 +82,14 @@ class DetectionConfig
 
     /**
      * @param list<string> $providedDirectories
+     *
      * @throws InvalidConfigException
      */
-    public static function fromConfigFile(array $providedDirectories, string $currentDirectory, string $configFilePath): self
+    public static function fromConfigFile(
+        array $providedDirectories,
+        string $currentDirectory,
+        string $configFilePath,
+    ): self
     {
         if (!extension_loaded('json')) {
             throw new InvalidConfigException("Json extension not loaded, unable to parse config file: $configFilePath");
@@ -112,18 +110,10 @@ class DetectionConfig
         }
 
         try {
-            $jsonThrowOnError = 4194304; // value of JSON_THROW_ON_ERROR (const unavailable till PHP 7.3)
-
             /** @throws JsonException */
-            $configArray = json_decode($configData, true, 512, JSON_PRESERVE_ZERO_FRACTION | $jsonThrowOnError);
+            $configArray = json_decode($configData, true, 512, JSON_PRESERVE_ZERO_FRACTION | JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             throw new InvalidConfigException("Failure while parsing JSON in $configFilePath: {$e->getMessage()}", $e);
-        }
-
-        $jsonError = json_last_error();
-
-        if ($jsonError !== JSON_ERROR_NONE) {
-            throw new InvalidConfigException("Failure while parsing JSON in $configFilePath: " . json_last_error_msg());
         }
 
         return self::fromConfigData($providedDirectories, $currentDirectory, dirname($configFilePath), $configArray);
@@ -131,9 +121,13 @@ class DetectionConfig
 
     /**
      * @param list<string> $providedPaths
+     *
      * @throws InvalidConfigException
      */
-    public static function fromDefaults(array $providedPaths, string $currentDirectory): self
+    public static function fromDefaults(
+        array $providedPaths,
+        string $currentDirectory,
+    ): self
     {
         return self::fromConfigData($providedPaths, $currentDirectory, $currentDirectory, []);
     }
@@ -141,7 +135,10 @@ class DetectionConfig
     /**
      * @throws InvalidConfigException
      */
-    private static function joinPath(string $directory, string $path): string
+    private static function joinPath(
+        string $directory,
+        string $path,
+    ): string
     {
         $absolutePath = $directory . DIRECTORY_SEPARATOR . $path;
 
@@ -155,13 +152,14 @@ class DetectionConfig
     /**
      * @param list<string> $providedDirectories
      * @param mixed $configData
+     *
      * @throws InvalidConfigException
      */
     private static function fromConfigData(
         array $providedDirectories,
         string $currentDirectory,
         string $configFileDirectory,
-        $configData
+        $configData,
     ): self
     {
         try {
@@ -196,7 +194,7 @@ class DetectionConfig
             $absoluteExcludePaths,
             $normalizedConfig['fileExtensions'],
             $currentDirectory,
-            $normalizedConfig['ignoreParseFailures']
+            $normalizedConfig['ignoreParseFailures'],
         );
     }
 
