@@ -173,15 +173,16 @@ class CollisionDetector
                     if ($expected !== null) {
                         $name .= $token->text;
                     }
-
                     continue 2;
 
                 case T_CONST:
                 case T_FUNCTION:
-                    if ($this->isWithinUseStatement($tokens, $index)) {
-                        break; // "use const" or "use function" statement, not a definition
+                    if (!$this->isWithinUseStatement($tokens, $index)) { // ignore "use const" or "use function"
+                        $expected = $token->id;
+                        $line = $token->line;
+                        $name = '';
                     }
-                    // no break - process as definition
+                    continue 2;
 
                 case T_NAMESPACE:
                 case T_CLASS:
@@ -198,12 +199,11 @@ class CollisionDetector
                     $level++;
             }
 
-            $tokenText = $token->text;
-
             if ($expected !== null) {
                 if ($expected === T_NAMESPACE) {
                     $namespace = $name !== '' ? $name . '\\' : '';
-                    $minLevel = $tokenText === '{' ? 1 : 0;
+                    $minLevel = $token->text === '{' ? 1 : 0;
+
                 } elseif ($name !== '' && $level === $minLevel) {
                     $types[$this->detectGroupType($expected)][] = ['line' => $line, 'name' => $namespace . $name];
                 }
@@ -211,9 +211,10 @@ class CollisionDetector
                 $expected = null;
             }
 
-            if ($tokenText === '{') {
+            if ($token->text === '{') {
                 $level++;
-            } elseif ($tokenText === '}') {
+
+            } elseif ($token->text === '}') {
                 $level--;
             }
         }
