@@ -28,21 +28,21 @@ class DetectionConfig
     /**
      * @var list<string>
      */
-    private array $scanPaths;
+    private readonly array $scanPaths;
 
     /**
      * @var list<string>
      */
-    private array $excludePaths;
+    private readonly array $excludePaths;
 
     /**
      * @var list<string>
      */
-    private array $fileExtensions;
+    private readonly array $fileExtensions;
 
-    private string $currentDirectory;
+    private readonly string $currentDirectory;
 
-    private bool $ignoreParseFailures;
+    private readonly bool $ignoreParseFailures;
 
     /**
      * @param list<string> $scanPaths Absolute paths

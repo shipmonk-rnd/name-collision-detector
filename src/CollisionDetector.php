@@ -16,9 +16,8 @@ use function is_file;
 use function ksort;
 use function preg_quote;
 use function preg_replace;
-use function strlen;
-use function strpos;
-use function substr;
+use function str_contains;
+use function str_ends_with;
 use function usort;
 use const T_CLASS;
 use const T_COMMENT;
@@ -40,12 +39,12 @@ use const TOKEN_PARSE;
 class CollisionDetector
 {
 
-    public const TYPE_GROUP_CLASS = 'class';
-    public const TYPE_GROUP_FUNCTION = 'function';
-    public const TYPE_GROUP_CONSTANT = 'const';
+    final public const TYPE_GROUP_CLASS = 'class';
+    final public const TYPE_GROUP_FUNCTION = 'function';
+    final public const TYPE_GROUP_CONSTANT = 'const';
 
     public function __construct(
-        private DetectionConfig $config,
+        private readonly DetectionConfig $config,
     )
     {
     }
@@ -247,7 +246,7 @@ class CollisionDetector
     private function isExtensionToCheck(string $filePath): bool
     {
         foreach ($this->config->getFileExtensions() as $extension) {
-            if (substr($filePath, -(strlen($extension) + 1)) === ".$extension") {
+            if (str_ends_with($filePath, ".$extension")) {
                 return true;
             }
         }
@@ -285,28 +284,18 @@ class CollisionDetector
      */
     private function detectGroupType(int $tokenId): string
     {
-        switch ($tokenId) {
-            case T_ENUM:
-            case T_CLASS:
-            case T_TRAIT:
-            case T_INTERFACE:
-                return self::TYPE_GROUP_CLASS;
-
-            case T_FUNCTION:
-                return self::TYPE_GROUP_FUNCTION;
-
-            case T_CONST:
-                return self::TYPE_GROUP_CONSTANT;
-
-            default:
-                throw new LogicException("Unexpected token #$tokenId");
-        }
+        return match ($tokenId) {
+            T_ENUM, T_CLASS, T_TRAIT, T_INTERFACE => self::TYPE_GROUP_CLASS,
+            T_FUNCTION => self::TYPE_GROUP_FUNCTION,
+            T_CONST => self::TYPE_GROUP_CONSTANT,
+            default => throw new LogicException("Unexpected token #$tokenId"),
+        };
     }
 
     private function isExcluded(string $filePath): bool
     {
         foreach ($this->config->getExcludePaths() as $excludePath) {
-            if (strpos($filePath, $excludePath) !== false) {
+            if (str_contains($filePath, $excludePath)) {
                 return true;
             }
         }

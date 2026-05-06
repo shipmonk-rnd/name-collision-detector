@@ -9,9 +9,9 @@ class DetectionResult
      * @param array<string, list<FileLine>> $collisions
      */
     public function __construct(
-        private int $analysedFilesCount,
-        private int $excludedFilesCount,
-        private array $collisions,
+        private readonly int $analysedFilesCount,
+        private readonly int $excludedFilesCount,
+        private readonly array $collisions,
     )
     {
     }
