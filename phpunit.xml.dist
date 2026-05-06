@@ -6,8 +6,8 @@
         beStrictAboutOutputDuringTests="true"
         beStrictAboutChangesToGlobalState="true"
         beStrictAboutCoverageMetadata="true"
-        failOnRisky="true"
-        failOnWarning="true"
+        failOnAllIssues="true"
+        displayDetailsOnAllIssues="true"
         cacheDirectory="cache/phpunit"
 >
     <php>
