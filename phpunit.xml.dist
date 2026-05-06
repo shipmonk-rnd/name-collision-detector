@@ -5,12 +5,10 @@
         bootstrap="vendor/autoload.php"
         beStrictAboutOutputDuringTests="true"
         beStrictAboutChangesToGlobalState="true"
-        beStrictAboutCoversAnnotation="true"
-        beStrictAboutTodoAnnotatedTests="true"
+        beStrictAboutCoverageMetadata="true"
         failOnRisky="true"
         failOnWarning="true"
-        convertDeprecationsToExceptions="false"
-        cacheResultFile="cache/phpunit.result.cache"
+        cacheDirectory="cache/phpunit"
 >
     <php>
         <ini name="error_reporting" value="-1"/>
