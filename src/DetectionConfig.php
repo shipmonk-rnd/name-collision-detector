@@ -19,7 +19,6 @@ use function is_readable;
 use function json_decode;
 use function realpath;
 use const DIRECTORY_SEPARATOR;
-use const JSON_PRESERVE_ZERO_FRACTION;
 use const JSON_THROW_ON_ERROR;
 
 class DetectionConfig
@@ -111,7 +110,7 @@ class DetectionConfig
 
         try {
             /** @throws JsonException */
-            $configArray = json_decode($configData, true, 512, JSON_PRESERVE_ZERO_FRACTION | JSON_THROW_ON_ERROR);
+            $configArray = json_decode($configData, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             throw new InvalidConfigException("Failure while parsing JSON in $configFilePath: {$e->getMessage()}", $e);
         }
