@@ -2886,12 +2886,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/shipmonk-rnd/coding-standard.git",
-                "reference": "556e3d2499dec123904ec09d90e5d1d8a2b36844"
+                "reference": "0bc44b528497e379e30641edde64b9d425795a7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shipmonk-rnd/coding-standard/zipball/556e3d2499dec123904ec09d90e5d1d8a2b36844",
-                "reference": "556e3d2499dec123904ec09d90e5d1d8a2b36844",
+                "url": "https://api.github.com/repos/shipmonk-rnd/coding-standard/zipball/0bc44b528497e379e30641edde64b9d425795a7a",
+                "reference": "0bc44b528497e379e30641edde64b9d425795a7a",
                 "shasum": ""
             },
             "require": {
@@ -2928,7 +2928,7 @@
                 "issues": "https://github.com/shipmonk-rnd/coding-standard/issues",
                 "source": "https://github.com/shipmonk-rnd/coding-standard/tree/add-generic-custom-sniffs"
             },
-            "time": "2026-06-22T07:30:14+00:00"
+            "time": "2026-06-22T10:52:55+00:00"
         },
         {
             "name": "shipmonk/composer-dependency-analyser",
